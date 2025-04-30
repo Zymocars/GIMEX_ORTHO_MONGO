@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 // import LoginPage from './LoginPage';
 
 export default function SignupPage() {
@@ -49,34 +50,53 @@ export default function SignupPage() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validate();
 
     if (Object.keys(newErrors).length === 0) {
       setIsSubmitting(true);
+      try {
+        //here API call 
+        const response = await axios.post(`http://localhost:5000/api/auth/register`,{
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
 
-      // Simulate API call
-      setTimeout(() => {
+        });
+        console.log(`Signup successful:`,response.data);
+
         setIsSubmitting(false);
         setIsSuccess(true);
-        // Reset form after successful submission
+
+        // form resets and redirest 
         setFormData({
+          
           name: "",
           email: "",
           password: "",
           confirmPassword: "",
         });
-         navigate("/");
+        navigate("/loginPage");
         setTimeout(() => {
           setIsSuccess(false);
-        }, 3000);
-      }, 1500);
+        }, 5000);
+      } catch (error) {
+        console.error(`Signup error:`,error.response?.data || error.message);
+        setIsSubmitting(false);
+      
+        //error come from backend
+        if (error.response?.message) {
+          alert(error.response.data.message);
+        } else {
+          alert(`Something went wrong. Please try again .`);
+        }
+      }
     } else {
       setErrors(newErrors);
-    }
-  };
-
+    } 
+  }; 
+    
   const handleSocialSignup = (provider) => {
     console.log(`Signing up with ${provider}`);
     // Here you would implement the actual social media authentication

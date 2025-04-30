@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaUsers, FaClock, FaSignInAlt, FaBars } from "react-icons/fa";
+import {
+   FaTachometerAlt,  
+  FaBoxOpen, 
+  FaShoppingCart,
+  FaUsers, FaClock, 
+  FaSignInAlt, 
+   FaPlus ,
+  FaBars } from "react-icons/fa";
 
 const Sidebar = () => {
   // State to manage menu open/close
@@ -12,12 +19,13 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { path: "/loginPage", label: "Login", icon: <FaSignInAlt /> },
-    { path: "/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
-    { path: "/products", label: "Products", icon: <FaBoxOpen /> },
-    { path: "/orders", label: "Orders", icon: <FaShoppingCart /> },
-    { path: "/users", label: "Users", icon: <FaUsers /> },
-    { path: "/ongoing-orders", label: "Ongoing Orders", icon: <FaClock /> },
+    { path: "/admin/adminLogin", label: "Login", icon: <FaSignInAlt /> },
+    { path: "/admin/dashboard", label: "Dashboard", icon: <FaTachometerAlt/> },
+    { path: "/admin/products", label: "Products", icon: <FaBoxOpen/> },
+    { path: "/admin/orders", label: "Orders", icon: <FaShoppingCart/> },
+    { path: "/admin/users", label: "Users", icon: <FaUsers/> },
+    { path: "/admin/addProduct", label: "Add Product", icon: <FaPlus /> },
+    { path: "/admin/ongoing-orders", label: "Ongoing Orders", icon: <FaClock /> },
   ];
 
   return (
