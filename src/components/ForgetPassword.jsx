@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SignupPage from './SignUp';
 
-export default function LoginPage() {
+export default function ForgetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -64,7 +64,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-gray-800">Welcome Back</h1>
-          <p className="text-sm text-gray-600">Log in to your account</p>
+          {/* <p className="text-sm text-gray-600">Log in to your account</p> */}
         </div>
         
         {/* Login Form */}
@@ -86,14 +86,14 @@ export default function LoginPage() {
             </div>
           </div>
           
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <div className="flex justify-between">
               <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
-              <a href="forgetPassword" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+              <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500">
                 Forgot password?
               </a>
-            </div>
-            <div className="relative">
+            </div> */}
+            {/* <div className="relative">
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -103,19 +103,19 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 required
                 autoComplete="current-password"
-              />
+              /> */}
               {/* <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" /> */}
-              <button
+              {/* <button
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="absolute right-2 top-2 h-5 w-5 text-gray-400"
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
-          </div>
+              </button> */}
+            {/* </div> */}
+          {/* </div> */}
           
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
                 id="remember-me"
@@ -128,25 +128,25 @@ export default function LoginPage() {
                 Remember me
               </label>
             </div>
-          </div>
+          </div> */}
           
           <button
             type="submit"
-            onClick={()=> {navigate('/')}}
+            onClick={()=> {navigate('/resetPassword')}}
             className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
-            Log In
+            Submit
           </button>
         </form>
         
-        <div className="relative my-6 flex items-center">
+        {/* <div className="relative my-6 flex items-center">
           <div className="flex-grow border-t border-gray-300"></div>
           <span className="mx-4 flex-shrink text-sm text-gray-600">Or continue with</span>
           <div className="flex-grow border-t border-gray-300"></div>
-        </div>
+        </div> */}
         
         {/* Social Login Buttons */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* <div className="grid grid-cols-3 gap-3">
           <button 
             onClick={() => handleSocialLogin('Google')}
             className="flex items-center justify-center rounded-md border border-gray-300 bg-white p-2 hover:bg-gray-50"
@@ -187,14 +187,14 @@ export default function LoginPage() {
           >
             <Twitter size={20} className="text-sky-500" />
           </button>
-        </div>
+        </div> */}
         
-        <p className="mt-6 text-center text-sm text-gray-600">
+        {/* <p className="mt-6 text-center text-sm text-gray-600">
           Don't have an account yet?{' '}
           <a href="/signupPage" className="font-medium text-blue-600 hover:text-blue-500">
             Sign up
           </a>
-        </p>
+        </p> */}
       </div>
     </div>
   );

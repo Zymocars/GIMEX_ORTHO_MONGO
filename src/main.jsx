@@ -31,6 +31,8 @@ import AdminRoute from './Pages/Admin';
 import Sidebar from './Components/Sidebar';
 import AddProduct from './Pages/AddProduct';
 import AdminLogin from './Pages/AdminLogin';
+import ForgetPassword from './components/ForgetPassword';
+import SetNewPasswordPage from './components/SetNewPassword';
 
 // import App from './App'
 // import LoginPage from './components/Login'
@@ -66,6 +68,8 @@ const router = createBrowserRouter(
     <Route path='signupPage' element={<SignupPage />}></Route>
     {/* <Route path='addProduct' element={<AddProduct />}></Route> */}
     {/* <Route path='adminLogin' element={<AdminLogin />}></Route> */}
+    <Route path='forgetPassword' element={<ForgetPassword />}></Route>
+    <Route path='resetPassword' element={<SetNewPasswordPage />}></Route>
 
   
 
