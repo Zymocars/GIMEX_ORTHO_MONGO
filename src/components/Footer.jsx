@@ -1,5 +1,15 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link,NavLink} from "react-router-dom";
+import {
+  FaTachometerAlt,
+  FaBoxOpen,
+  FaShoppingCart,
+  FaUsers,
+  FaPlus,
+  FaClock,
+  FaSignInAlt,
+} from "react-icons/fa";
+
 const Footer = () => {
   // Footer links data structure
   const footerLinks = [
@@ -31,6 +41,17 @@ const Footer = () => {
       email: "gimex@gimexortho.com",
     },
   ];
+
+  const adminNavItems = [
+    { path: "/admin/login", label: "Login", icon: <FaSignInAlt /> },
+    { path: "/admin/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
+    { path: "/admin/products", label: "Products", icon: <FaBoxOpen /> },
+    { path: "/admin/orders", label: "Orders", icon: <FaShoppingCart /> },
+    { path: "/admin/users", label: "Users", icon: <FaUsers /> },
+     { path: "/admin/addProduct", label: "Add Product", icon: <FaPlus /> },
+    { path: "/admin/ongoing-orders", label: "Ongoing Orders", icon: <FaClock /> },
+  ];
+
 
   return (
     // <footer className="bg-[#303030] text-white py-8 w-full overflow-hidden">
@@ -72,6 +93,28 @@ const Footer = () => {
             </div>
           ))}
         </div>
+
+         {/* Admin Footer Navigation */}
+         <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-4">Admin Navigation</h2>
+          <nav className="flex flex-wrap justify-center gap-6">
+            {adminNavItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  `flex items-center gap-2 hover:text-yellow-400 ${
+                    isActive ? "text-yellow-400" : ""
+                  }`
+                }
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+
 
         {/* Divider Line */}
         {/* <div className="border-t border-gray-600 my-6"></div>
