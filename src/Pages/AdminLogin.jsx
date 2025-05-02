@@ -121,17 +121,17 @@ const AdminLogin = () => {
             {loading ? 'Signing in...' : 'Sign In to Admin'}
           </button>
         </div>
-        
+{/*         
         <div className="mt-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between"> */}
             {/* <a href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500">
               Forgot your password?
             </a> */}
-            <a href="/" className="text-sm text-indigo-600 hover:text-indigo-500">
+            {/* <a href="/" className="text-sm text-indigo-600 hover:text-indigo-500">
               Return to user login
             </a>
           </div>
-        </div>
+        </div> */}
         
         {/* <div className="mt-8 pt-6 border-t border-gray-200 text-center">
           <p className="text-xs text-gray-500">
