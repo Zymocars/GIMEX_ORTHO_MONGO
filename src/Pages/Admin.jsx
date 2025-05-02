@@ -1,24 +1,82 @@
-import React from "react";
-import { Outlet, Navigate, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../Components/Sidebar"; // Adjust the import path as needed
-
-// This component will check if the user is authenticated as an admin
-// and either show the admin content or redirect to login
 
 const AdminRoute = () => {
   const location = useLocation();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-   // Get user info from localStorage (you can use context or Redux as well)
-   const user = JSON.parse(localStorage.getItem("user"));
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      try {
+        // Get user info from localStorage
+        const user = JSON.parse(localStorage.getItem("user") || '{}');
+        const token = localStorage.getItem("token");
+        
+        // Basic validation
+        if (!user || !token) {
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
+        }
 
-     // Check if user exists and is an admin
-  const isAdmin = user?.isAdmin === true;
+        // Check if user is admin
+        if (user.isAdmin === true) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
 
-  // If user is not admin, redirect to login page
-  if (!isAdmin) {
-    return <Navigate to="/loginPage" state={{ from: location }} replace />;
+        // Optional: Verify token with backend for extra security
+        // This helps prevent token tampering or using expired tokens
+        try {
+          const response = await fetch('http://localhost:5000/api/auth/verify-admin', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            // Token invalid or expired
+            setIsAuthenticated(false);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+          }
+        } catch (err) {
+          console.error("Token verification error:", err);
+          // If API is unavailable, we'll rely on the client-side check
+        }
+      } catch (error) {
+        console.error("Authentication check error:", error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Verifying admin access...</p>
+        </div>
+      </div>
+    );
   }
 
+  // If not authenticated as admin, redirect to admin login page
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+
+  // If authenticated as admin, render the admin layout with outlet
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}

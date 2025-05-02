@@ -1,6 +1,5 @@
-import React from "react";
-import { useState } from 'react';
-import { Eye, EyeOff, Lock, Mail, ShieldAlert } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Eye, EyeOff, ShieldAlert, Mail, Lock } from 'lucide-react';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -8,6 +7,14 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Check if user is already logged in as admin
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || '{}');
+    if (user && user.isAdmin === true) {
+      window.location.href = '/admin/dashboard';
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,10 +34,17 @@ const AdminLogin = () => {
       const data = await response.json();
       
       if (response.ok) {
-        // Handle successful login
-        // For example, store token in localStorage and redirect
-        localStorage.setItem('adminToken', data.token);
-        window.location.href = '/admin/dashboard';
+        // Check if the user is an admin
+        if (data.user && data.user.isAdmin) {
+          // Store user data including the isAdmin flag
+          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('token', data.token);
+          
+          // Redirect to admin dashboard
+          window.location.href = '/admin/dashboard';
+        } else {
+          setError('Access denied. You do not have admin privileges.');
+        }
       } else {
         setError(data.message || 'Login failed. Please check your credentials.');
       }
@@ -76,7 +90,7 @@ const AdminLogin = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="admin@company.com"
+                placeholder="Enter email address"
                 required
               />
             </div>
@@ -96,7 +110,7 @@ const AdminLogin = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="pl-10 pr-10 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="••••••••"
+                placeholder="Password"
                 required
               />
               <button
@@ -114,24 +128,21 @@ const AdminLogin = () => {
           </div>
           
           <button
-            onClick={handleLogin}
+            onClick={(e) => handleLogin(e)}
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-70"
           >
             {loading ? 'Signing in...' : 'Sign In to Admin'}
           </button>
         </div>
-{/*         
+        
         <div className="mt-6">
-          <div className="flex items-center justify-between"> */}
-            {/* <a href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500">
-              Forgot your password?
-            </a> */}
-            {/* <a href="/" className="text-sm text-indigo-600 hover:text-indigo-500">
-              Return to user login
+          <div className="flex items-center justify-between">
+            <a href="/" className="text-sm text-indigo-600 hover:text-indigo-500">
+              Return to main site
             </a>
           </div>
-        </div> */}
+        </div>
         
         {/* <div className="mt-8 pt-6 border-t border-gray-200 text-center">
           <p className="text-xs text-gray-500">
