@@ -21,6 +21,7 @@ import ProductPage from './components/Buy_Product';
 import 'material-icons/iconfont/material-icons.css';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignUp';
+import ForgetPassword from './components/ForgetPassword';
 
 // Admin imports
 import Products from './Pages/Products';
@@ -51,6 +52,7 @@ const router = createBrowserRouter(
         <Route path='edit_profile' element={<Edit_Profile />} />
         <Route path='faqs' element={<FAQSection />} />
         <Route path='categories' element={<ExploreCategories />} />
+        <Route path='forgetPassword' element={<ForgetPassword />} />
       </Route>
 
       {/* Admin Login Route - Not protected by AdminRoute */}
