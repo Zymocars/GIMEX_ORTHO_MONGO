@@ -16,7 +16,8 @@ router.put('/user/address', auth, userController.updateAddress);
 router.get('/user/getorders', auth, orderController.getUserOrders);
 router.post('/user/placeorder', auth, orderController.createOrder);
 router.delete('/user/deleteorders/:orderId', auth, orderController.deleteOrder);
-
+router.post('/user/forgotpassword', userController.forgotPassword);
+router.post('/user/resetpassword/:token', userController.resetPassword);
 
 router.get('/health', (req, res) => {
     res.status(200).json({ message: 'Server is running' });
