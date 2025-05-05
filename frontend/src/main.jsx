@@ -32,6 +32,7 @@ import OngoingOrders from './Pages/OngoinOrders';
 import AdminRoute from './Pages/Admin';
 <<<<<<< HEAD
 import Sidebar from './Components/Sidebar';
+// import Sidebar from './components/Sidebar';
 =======
 >>>>>>> 65c8a6d3a7b369f773328abc29b39bdb580a72a9
 import AddProduct from './Pages/AddProduct';
