@@ -35,7 +35,11 @@ const UserSchema =mongoose.Schema(
             state: { type: String, required: false },
             pincode: { type: String, required: false }
         },
+        resetPasswordToken: String,
+        resetPasswordExpires: Date,
+
     },
+    
     {
         timestamps:true
     }
