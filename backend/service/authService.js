@@ -24,32 +24,40 @@ const generateToken = (user) => {
 
   //Register service
   const registerUser = async ({ name, email, password }) => {
-    try{
-    console.log("Registering.....")
-    const existingUser = await User.findOne({ email });
-    
-    if (existingUser) {
-      console.log(existingUser.email);
-      throw new Error('Email already in use');
-    }
+    try {
+        console.log("Registering.....")
+        const existingUser = await User.findOne({ email });
+        
+        if (existingUser) {
+            console.log(`Email ${email} already in use`);
+            return {
+                success: false,
+                message: 'Email already in use'
+            };
+        }
    
-  
-    const hashedPassword = await bcrypt.hash(password, 12);
-    
-    console.log('Creating user in db')
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
-    console.log('generating token');
-    const token = generateToken(user);
-    return { user: { ...user._doc, password: undefined }, token };
-  }
-  catch(error){
-    console.error(error.stack);
-  }
-  };
+        const hashedPassword = await bcrypt.hash(password, 12);
+        
+        console.log('Creating user in db')
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+        });
+        console.log('generating token');
+        const token = generateToken(user);
+        
+        return {
+            success: true,
+            user: { ...user._doc, password: undefined },
+            token
+        };
+    }
+    catch(error) {
+        console.error('Registration service error:', error);
+        throw new Error(error.message || 'Registration failed');
+    }
+};
 
   //Login service
   const loginUser = async ({ email, password }) => {
@@ -91,8 +99,44 @@ const generateToken = (user) => {
         throw error; // Re-throw to be handled by controller
     }
 };
+const adminLogin = async ({ email, password }) => {
+  try {
+      console.log('Attempting admin login with email:', email);
+      
+      // Find user and check if they are admin
+      const user = await User.findOne({ email }).select('+password');
+      if (!user || !user.isAdmin) {
+          console.log('No admin user found with email:', email);
+          throw new Error('Invalid admin credentials');
+      }
+      
+      // Verify password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+          console.log('Password verification failed for admin:', email);
+          throw new Error('Invalid admin credentials');
+      }
+      
+      // Generate token
+      const token = generateToken(user);
+      
+      // Prepare admin data (excluding password)
+      const userData = user.toObject();
+      delete userData.password;
+      
+      console.log('Admin login successful for:', email);
+      return {
+          user: userData,
+          token
+      };
+  } catch (error) {
+      console.error('Admin login failed:', error.message);
+      throw error;
+  }
+};
   
   module.exports = {
     registerUser,
     loginUser,
+    adminLogin
   };

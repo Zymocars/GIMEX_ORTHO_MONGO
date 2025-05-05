@@ -9,6 +9,7 @@ const orderController=require('../controller/orderController.js');
 //auth routes
 router.post('/auth/register',authController.register); //register route
 router.post('/auth/login',authController.login); //login route
+router.post('/auth/admin/login', authController.adminLogin); //admin login route
 
 //user routes
 router.put('/user/address', auth, userController.updateAddress);
