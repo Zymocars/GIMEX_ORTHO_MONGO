@@ -31,23 +31,23 @@ const AdminRoute = () => {
 
         // Optional: Verify token with backend for extra security
         // This helps prevent token tampering or using expired tokens
-        try {
-          const response = await fetch('http://localhost:5000/api/auth/verify-admin', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
+        // try {
+        //   const response = await fetch('http://localhost:5000/api/auth/admin/login', {
+        //     headers: {
+        //       'Authorization': `Bearer ${token}`
+        //     }
+        //   });
           
-          if (!response.ok) {
-            // Token invalid or expired
-            setIsAuthenticated(false);
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
-          }
-        } catch (err) {
-          console.error("Token verification error:", err);
-          // If API is unavailable, we'll rely on the client-side check
-        }
+        //   if (!response.ok) {
+        //     // Token invalid or expired
+        //     setIsAuthenticated(false);
+        //     localStorage.removeItem('user');
+        //     localStorage.removeItem('token');
+        //   }
+        // } catch (err) {
+        //   console.error("Token verification error:", err);
+        //   // If API is unavailable, we'll rely on the client-side check
+        // }
       } catch (error) {
         console.error("Authentication check error:", error);
         setIsAuthenticated(false);

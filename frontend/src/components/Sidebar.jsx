@@ -1,50 +1,72 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
-   FaTachometerAlt,  
-  FaBoxOpen, 
+  FaTachometerAlt,
+  FaBoxOpen,
   FaShoppingCart,
-  FaUsers, FaClock, 
-  FaSignInAlt, 
-   FaPlus ,
-  FaBars } from "react-icons/fa";
+  FaUsers,
+  FaClock,
+  FaSignInAlt,
+  FaPlus,
+  FaBars,
+  FaTimes
+} from "react-icons/fa";
+
+const navItems = [
+  { path: "/admin/login", label: "Login", icon: <FaSignInAlt /> },
+  { path: "/admin/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
+  { path: "/admin/products", label: "Products", icon: <FaBoxOpen /> },
+  { path: "/admin/orders", label: "Orders", icon: <FaShoppingCart /> },
+  { path: "/admin/users", label: "Users", icon: <FaUsers /> },
+  { path: "/admin/addProduct", label: "Add Product", icon: <FaPlus /> },
+  { path: "/admin/ongoing-orders", label: "Ongoing Orders", icon: <FaClock /> },
+];
 
 const Sidebar = () => {
-  // State to manage menu open/close
   const [isOpen, setIsOpen] = useState(false);
+  const toggleMenu = () => setIsOpen(!isOpen);
 
-  // Toggle the sidebar visibility
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
+  // Close the menu when clicking outside
+  const handleOverlayClick = () => {
+    setIsOpen(false);
   };
 
-  const navItems = [
-    { path: "/admin/adminLogin", label: "Login", icon: <FaSignInAlt /> },
-    { path: "/admin/dashboard", label: "Dashboard", icon: <FaTachometerAlt/> },
-    { path: "/admin/products", label: "Products", icon: <FaBoxOpen/> },
-    { path: "/admin/orders", label: "Orders", icon: <FaShoppingCart/> },
-    { path: "/admin/users", label: "Users", icon: <FaUsers/> },
-    { path: "/admin/addProduct", label: "Add Product", icon: <FaPlus /> },
-    { path: "/admin/ongoing-orders", label: "Ongoing Orders", icon: <FaClock /> },
-  ];
-
   return (
-    <div>
-      {/* Hamburger Menu Button */}
+    <>
+      {/* Mobile Menu Toggle Button - moved to right side */}
       <button
-        className="text-black text-2xl px-6  top-2 left-4 z-10 md:hidden "
+        className="md:hidden text-2xl p-4 text-black fixed top-0 right-0 z-30"
         onClick={toggleMenu}
+        aria-label="Toggle menu"
       >
         <FaBars />
       </button>
 
-      {/* Sidebar Menu */}
+      {/* Overlay for mobile - only shows when menu is open */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          onClick={handleOverlayClick}
+        />
+      )}
+
+      {/* Sidebar for all screen sizes - slides in/out on mobile */}
       <div
-        className={`w-64 h-screen bg-gray-800 text-white p-4 fixed top-0 left-0 z-20 transition-transform transform ${
+        className={`bg-gray-800 text-white w-64 h-screen p-4 fixed top-0 left-0 z-20 transform transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0`}
+        } md:translate-x-0`}
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Admin Panel</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Admin Panel</h2>
+          <button 
+            className="md:hidden text-white text-xl" 
+            onClick={toggleMenu}
+            aria-label="Close menu"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
         <nav className="flex flex-col gap-4">
           {navItems.map((item) => (
             <NavLink
@@ -55,6 +77,7 @@ const Sidebar = () => {
                   isActive ? "bg-gray-700" : ""
                 }`
               }
+              onClick={() => setIsOpen(false)}
             >
               {item.icon}
               <span>{item.label}</span>
@@ -62,7 +85,7 @@ const Sidebar = () => {
           ))}
         </nav>
       </div>
-    </div>
+    </>
   );
 };
 

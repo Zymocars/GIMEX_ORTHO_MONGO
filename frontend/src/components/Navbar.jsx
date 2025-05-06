@@ -49,7 +49,7 @@ const Navbar = () => {
 
           {/* Account Details */}
           <div className="flex justify-end h-12 w-auto">
-          <Link to="/SignUp" className="flex flex-col items-center justify-center text-gray-700 hover:text-amber-700 w-20 h-12 self-start">
+          <Link to="/signupPage" className="flex flex-col items-center justify-center text-gray-700 hover:text-amber-700 w-20 h-12 self-start">
           {/* <User className="w-5 h-5 mb-1 " /> */}
           <User className="w-7 h-5 mb-1 "/>
               {/* <span className="text-sm">Account

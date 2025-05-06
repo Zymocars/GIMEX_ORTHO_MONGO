@@ -20,24 +20,28 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+    console.log("attempting adimin login with :",{email,password});
     try {
       // Replace with your actual admin login API endpoint
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/auth/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include', // Include cookies in the request
       });
+
+      console.log("login response status:",response.status);
       
       const data = await response.json();
       
       if (response.ok) {
         // Check if the user is an admin
-        if (data.user && data.user.isAdmin) {
+        if (data.data && data.data.isAdmin) {
+          console.log("admin login successful");
           // Store user data including the isAdmin flag
-          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('user', JSON.stringify(data.data));
           localStorage.setItem('token', data.token);
           
           // Redirect to admin dashboard
