@@ -11,13 +11,17 @@ import AboutUsPage from './About'
 import Contact from './Contact'
 import ExploreCategories from './Explore_cats'
 import ManageProfile from './Blogs'
+import { Sidebar } from 'lucide-react'
 // import RSB from './Booking_button'
-export default function Layout() {
+export default function Layout({children}) {
   return (
   <div>
     <Navbar/>
     <Outlet/>
     <Footer/>
+    <main className="flex-1 md:ml-64 mt-16 md:mt-0 mb-16 md:mb-0 p-4"> 
+      {children}
+    </main>
     </div>
   )
 }

@@ -42,15 +42,15 @@ const Footer = () => {
     },
   ];
 
-  const adminNavItems = [
-    { path: "/admin/login", label: "Login", icon: <FaSignInAlt /> },
-    { path: "/admin/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
-    { path: "/admin/products", label: "Products", icon: <FaBoxOpen /> },
-    { path: "/admin/orders", label: "Orders", icon: <FaShoppingCart /> },
-    { path: "/admin/users", label: "Users", icon: <FaUsers /> },
-     { path: "/admin/addProduct", label: "Add Product", icon: <FaPlus /> },
-    { path: "/admin/ongoing-orders", label: "Ongoing Orders", icon: <FaClock /> },
-  ];
+  // const adminNavItems = [
+  //   { path: "/admin/login", label: "Login", icon: <FaSignInAlt /> },
+  //   { path: "/admin/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
+  //   { path: "/admin/products", label: "Products", icon: <FaBoxOpen /> },
+  //   { path: "/admin/orders", label: "Orders", icon: <FaShoppingCart /> },
+  //   { path: "/admin/users", label: "Users", icon: <FaUsers /> },
+  //    { path: "/admin/addProduct", label: "Add Product", icon: <FaPlus /> },
+  //   { path: "/admin/ongoing-orders", label: "Ongoing Orders", icon: <FaClock /> },
+  // ];
 
 
   return (
@@ -95,7 +95,7 @@ const Footer = () => {
         </div>
 
          {/* Admin Footer Navigation */}
-         <div className="mt-8">
+         {/* <div className="mt-8">
           <h2 className="text-lg font-semibold mb-4">Admin Navigation</h2>
           <nav className="flex flex-wrap justify-center gap-6">
             {adminNavItems.map((item) => (
@@ -113,7 +113,7 @@ const Footer = () => {
               </NavLink>
             ))}
           </nav>
-        </div>
+        </div> */}
 
 
         {/* Divider Line */}
