@@ -23,7 +23,7 @@ const AdminLogin = () => {
     console.log("attempting adimin login with :",{email,password});
     try {
       // Replace with your actual admin login API endpoint
-      const response = await fetch('http://localhost:5000/api/auth/admin/login', {
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}api/auth/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
