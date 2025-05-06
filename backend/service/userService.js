@@ -25,7 +25,7 @@ const forgotPassword = async (email) => {
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
-    const resetLink = `http://localhost:5000/resetpassword/${token}`; // Replace with your frontend URL that opens the reset password page
+    const resetLink = `${process.env.FRONTEND_URL}/resetpassword/${token}`; // Replace with your frontend URL that opens the reset password page
     console.log("RESET LINK (DEV):", resetLink);
   const transporter = nodemailer.createTransport({
     service: 'gmail',
