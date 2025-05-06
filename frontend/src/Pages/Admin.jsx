@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import Sidebar from "../Components/Sidebar"; // Adjust the import path as needed
+import Sidebar from "../components/Sidebar"; // Adjust the import path as needed
 
 const AdminRoute = () => {
   const location = useLocation();
