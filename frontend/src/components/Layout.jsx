@@ -19,9 +19,9 @@ export default function Layout({children}) {
     <Navbar/>
     <Outlet/>
     <Footer/>
-    <main className="flex-1 md:ml-64 mt-16 md:mt-0 mb-16 md:mb-0 p-4"> 
+    {/* <main className="flex-1 md:ml-64 mt-16 md:mt-0 mb-16 md:mb-0 p-4"> 
       {children}
-    </main>
+    </main> */}
     </div>
   )
 }
