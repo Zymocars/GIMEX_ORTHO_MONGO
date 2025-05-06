@@ -42,10 +42,66 @@ const updateAddress = async (req, res) => {
     }
         
 };
+const forgotPassword = async (req, res) => {
+    console.log('Forgot password started...');
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please enter all fields'
+            });
+        }
+        console.log('Attempting to send password reset link...');
+        const result = await userService.forgotPassword(email);
+        console.log('Password reset link sent successfully:', result);
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+    }
+    catch (error) {
+        console.log('Error sending password reset link:', error.stack);
+        res.status(500).json({
+            success: false,
+            message: error.message
 
+        });
+    }
+        
+};
+const resetPassword = async (req, res) => {
+    console.log('Reset password started...');
+    try {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+        if (!token || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please enter all fields'
+            });
+        }
+        console.log('Attempting to reset password...');
+        const result = await userService.resetPassword(token, newPassword);
+        console.log('Password reset successfully:', result);
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+    }
+    catch (error) {
+        console.log('Error resetting password:', error.stack);
+        res.status(500).json({
+            success: false,
+            message: error.message
 
-
+        });
+    }
+        
+}
 
 module.exports = {
-    updateAddress: [upload.none(), updateAddress] 
+    updateAddress: [upload.none(), updateAddress],
+    forgotPassword,
+    resetPassword,
 };
