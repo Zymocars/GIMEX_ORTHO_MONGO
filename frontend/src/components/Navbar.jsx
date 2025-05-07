@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ShoppingCart, User, Search ,Menu} from 'lucide-react';
 import { Link } from 'react-router-dom';
+import UserSidebar from './UserSidebar'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +58,8 @@ const Navbar = () => {
               </span> */}
             </Link>
           </div>
+
+          <UserSidebar/>
 
 
         </div>

@@ -22,6 +22,12 @@ import 'material-icons/iconfont/material-icons.css';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignUp';
 import ForgetPassword from './components/ForgetPassword';
+import UserDashboard from './Pages/UserDashboard';
+import PersonalInfo from './Pages/PersonalInfo';
+// import AccountSettings from './Pages/AccountSettings';
+import UserOngoingOrders from './components/UserOngoinOrders';
+import UserOrders from './components/Orders';
+// import UserLogout from './components/LogOut';
 
 // Admin imports
 import Products from './Pages/Products';
@@ -53,6 +59,12 @@ const router = createBrowserRouter(
         <Route path='faqs' element={<FAQSection />} />
         <Route path='categories' element={<ExploreCategories />} />
         <Route path='forgetPassword' element={<ForgetPassword />} />
+        <Route path='UserDashboard' element={<UserDashboard />} />
+        <Route path='personal_info' element={<PersonalInfo />} />
+        {/* <Route path='account_settings' element={<AccountSettings />} /> */}
+        <Route path='user-orders' element={<UserOrders />} />
+        <Route path='user-ongoing-orders' element={<UserOngoingOrders />} />
+        {/* <Route path='user-logout' element={<UserLogout />} /> */}
       </Route>
 
       {/* Admin Login Route - Not protected by AdminRoute */}
