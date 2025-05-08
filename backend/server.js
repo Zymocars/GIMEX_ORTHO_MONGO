@@ -5,6 +5,8 @@ const morgan = require('morgan');
 const connectDb = require('./config/db');
 const routes = require('./routes/route.js');
 
+const app = express();
+
 // Load env vars before any other imports
 dotenv.config();
 if (!process.env.JWT_SECRET) {
@@ -25,15 +27,13 @@ requiredEnvVars.forEach(varName => {
 
 connectDb();
 
-const app = express();
-const cor
+// this code is a part of cors
+const corsOptions = {
   origin: [process.env.FRONTEND_URL, 'https://gimex-ortho-mongo-frontend.vercel.app'],
- 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
   optionsSuccessStatus: 200
 };
-
 
 //Middleware
 app.use(morgan('dev')); //logging middleware
