@@ -27,8 +27,9 @@ connectDb();
 
 // this code is a part of cors
 const app = express();
-const corsOptions = {
+const cor
   origin: [process.env.FRONTEND_URL, 'https://gimex-ortho-mongo-frontend.vercel.app'],
+ 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
   optionsSuccessStatus: 200
