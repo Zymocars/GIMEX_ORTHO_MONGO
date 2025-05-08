@@ -39,6 +39,7 @@ app.use(morgan('dev')); //logging middleware
 app.use(express.json()); //json middleware
 app.use(express.urlencoded({ extended: true })); //urlencoded middleware
 app.use(cors(corsOptions)); //CORS middleware
+app.options('*', cors(corsOptions));
 
 
 //Routes
