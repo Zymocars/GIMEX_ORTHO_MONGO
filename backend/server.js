@@ -25,6 +25,7 @@ requiredEnvVars.forEach(varName => {
 
 connectDb();
 
+// this code is a part of cors
 const app = express();
 const corsOptions = {
   origin: [process.env.FRONTEND_URL, 'https://gimex-ortho-mongo-frontend.vercel.app'],
