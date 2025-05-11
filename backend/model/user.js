@@ -15,6 +15,11 @@ const UserSchema =mongoose.Schema(
             match:/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ //regix for email pattern verification
 
         },
+
+        role: { type: String, enum: ['Admin', 'User'], default: 'User' },
+        status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },
+        joined: { type: Date, default: Date.now },
+        
         password:{    //stored in hashed form
             type:String,
             required:true,

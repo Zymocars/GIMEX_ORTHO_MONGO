@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import { TruckIcon } from '@heroicons/react/24/outline';
-import { TagIcon } from '@heroicons/react/24/outline';
-// import materialIcons from 'material-icons-react';
-// import {TreshIcon} from '@heroicons/react/24/solid';
+import { TruckIcon, TagIcon } from '@heroicons/react/24/outline';
 
 export default function CartPage() {
   const [deliveryOption, setDeliveryOption] = useState("address");
@@ -19,8 +16,21 @@ export default function CartPage() {
     pincode: ""
   });
   const [addressAdded, setAddressAdded] = useState(false);
-  const pricePerItem = 4100;
-  const deliveryFee = 100;
+  const [isLoading, setIsLoading] = useState(false);
+  const [orderStatus, setOrderStatus] = useState({ success: false, message: "" });
+  const pricePerItem = 44;
+  const deliveryFee = 50;
+  const originalPrice = 49; // Original price before discount
+  const [cartItems, setCartItems] = useState([
+    {
+        _id: "645a567890abcdef12345678", // Example ObjectId
+        name: "GIMEX Ortho",
+        originalPrice: 49,
+        discountedPrice: 49 * 0.9,
+        quantity: 1,
+        image: "/images/Gimex_1.png"
+    }
+]);
 
   const handleIncrease = () => setQuantity(quantity + 1);
   const handleDecrease = () => {
@@ -37,10 +47,121 @@ export default function CartPage() {
 
   const handleAddressSubmit = (e) => {
     e.preventDefault();
-    // Here you would typically validate the form
-    // and send the data to your backend
     setAddressAdded(true);
     setShowAddressModal(false);
+  };
+
+  const validateOrder = () => {
+    // Check if address has been added
+    if (!addressAdded) {
+      setOrderStatus({
+        success: false,
+        message: "Please add a delivery address before placing your order."
+      });
+      return false;
+    }
+    
+    // Check if all required address fields are filled
+    const requiredFields = ['name', 'mobile', 'email', 'address', 'city', 'state', 'pincode'];
+    for (const field of requiredFields) {
+      if (!addressInfo[field]) {
+        setOrderStatus({
+          success: false,
+          message: `Please fill in all required address fields (${field} is missing).`
+        });
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  const placeOrder = async () => {
+    // First validate the order
+    if (!validateOrder()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setOrderStatus({ success: false, message: "" });
+
+    try {
+      // Get authentication token if user is logged in
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setOrderStatus({
+          success: false,
+          message: "Please log in to place an order."
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Format the order data to match the expected structure in the admin dashboard
+      const orderData = {
+        products: cartItems.map(item => ({
+          productId: item._id, // Use the actual ObjectId from the product data
+          name: item.name,
+          originalPrice: item.originalPrice,
+          discountedPrice: item.discountedPrice,
+          quantity: item.quantity,
+          image: item.image
+        })),
+        deliveryAddress: {
+          name: addressInfo.name,
+          mobile: addressInfo.mobile,
+          email: addressInfo.email,
+          address: addressInfo.address,
+          city: addressInfo.city,
+          state: addressInfo.state,
+          pincode: addressInfo.pincode
+        },
+        deliveryFee: deliveryFee,
+        totalAmount: itemTotal + deliveryFee,
+        couponCode: couponCode.trim() || null,
+        orderDate: new Date().toISOString()
+      };
+
+      // Make API call to create order
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/user/placeorder`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setOrderStatus({
+          success: true,
+          message: "Order placed successfully! Your order ID is " + data.data._id
+        });
+        
+        // Clear cart or reset order form after successful order
+        setQuantity(1);
+        setCouponCode("");
+        // Don't reset address as user might place another order with same address
+        
+        // You could redirect to order confirmation page here
+        // window.location.href = `/order-confirmation/${data.data._id}`;
+      } else {
+        setOrderStatus({
+          success: false,
+          message: data.message || "Failed to place your order. Please try again."
+        });
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      setOrderStatus({
+        success: false,
+        message: "An error occurred while placing your order. Please try again later."
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const itemTotal = pricePerItem * quantity;
@@ -52,45 +173,7 @@ export default function CartPage() {
       <div className="w-full md:w-2/3 space-y-4">
         <h1 className="text-2xl md:text-3xl font-bold">Cart</h1>
 
-        {/* Delivery Options */}
-        {/* <div className="border rounded-lg flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x">
-          <div className="flex items-start gap-2 p-4 sm:w-1/2 bg-green-50 border-green-500 border rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none">
-            <input
-              type="radio"
-              checked={deliveryOption === "address"}
-              onChange={() => setDeliveryOption("address")}
-              className="mt-1" />
-            <div>
-              <p className="font-semibold">Deliver this to an address</p>
-              <p className="text-sm text-gray-600">
-                Get estimated delivery time after you add the address
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-2 p-4 sm:w-1/2">
-            <input
-              type="radio"
-              checked={deliveryOption === "pickup"}
-              onChange={() => setDeliveryOption("pickup")}
-              className="mt-1" />
-            <div>
-              <p className="font-semibold">Pickup from store</p>
-              <p className="text-sm text-gray-600">
-                Check with store if pickup is available today
-              </p>
-            </div>
-          </div>
-        </div> */}
-
         {/* Delivery Address */}
-        {/* <div className="border p-4 rounded-lg flex justify-between items-center">
-          <p className="font-semibold flex items-center gap-2">
-          <TruckIcon className="h-5 w-5 text-gray-600" />
-           Delivery Address
-          </p>
-          <button className="text-green-700 font-semibold">Add address</button>
-          
-        </div> */}
         <div className="border p-4 rounded-lg flex justify-between items-center">
           <div className="flex-1">
             <p className="font-semibold flex items-center gap-2">
@@ -98,10 +181,10 @@ export default function CartPage() {
               Delivery Address
             </p>
             <button 
-            className="text-green-700 font-semibold relative right-0"
-            onClick={() => setShowAddressModal(true)}>
-            {addressAdded ? "Edit address" : "Add address"}
-          </button>
+              className="text-green-700 font-semibold relative right-0"
+              onClick={() => setShowAddressModal(true)}>
+              {addressAdded ? "Edit address" : "Add address"}
+            </button>
             {addressAdded && !showAddressModal && (
               <div className="mt-2 text-sm">
                 <p><span className="font-medium">Name:</span> {addressInfo.name}</p>
@@ -227,13 +310,12 @@ export default function CartPage() {
           </div>
         </div>
 
-        {/* Order Instructions */}
-        {/* <div className="border p-4 rounded-lg flex justify-between items-center">
-          <p className="font-semibold flex items-center gap-2">
-             Order Instructions
-          </p>
-          <button className="text-green-700 font-semibold">Add</button>
-        </div> */}
+        {/* Order Status Messages */}
+        {orderStatus.message && (
+          <div className={`p-4 rounded-lg ${orderStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            {orderStatus.message}
+          </div>
+        )}
       </div>
 
       {/* Right Side */}
@@ -242,14 +324,14 @@ export default function CartPage() {
           <img
             src="/images/Gimex_1.png"
             alt="Success ortho powder"
-            className=" w-[30px] h-[30px] mt-2"
+            className="w-[30px] h-[30px] mt-2"
           />
           <div className="flex-1">
             <p className="font-medium">GIMEX Ortho</p>
             <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-              <span className="line-through">₹4999</span>
+              <span className="line-through">₹{originalPrice}</span>
               <span className="text-black">₹{pricePerItem}</span>
-              <span className="text-green-600 font-semibold">18% OFF</span>
+              <span className="text-green-600 font-semibold">10% OFF</span>
             </div>
           </div>
           <div className="flex items-center gap-2 border px-2 py-1 rounded-full">
@@ -278,14 +360,22 @@ export default function CartPage() {
           </div>
         </div>
 
-        <button className="w-full bg-green-500 text-white py-3 rounded-full hover:bg-green-700 font-semibold overflow-hidden">
-          Place Order
+        <button 
+          className={`w-full py-3 rounded-full font-semibold overflow-hidden ${
+            isLoading 
+              ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+              : 'bg-green-500 text-white hover:bg-green-700'
+          }`}
+          onClick={placeOrder}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Processing...' : 'Place Order'}
         </button>
 
         {/* Available Offers */}
         <div className="border p-4 rounded-lg">
           <div className="flex items-center gap-2 font-semibold mb-2">
-          <TagIcon className="h-5 w-5 text-black" /> Available offers
+            <TagIcon className="h-5 w-5 text-black" /> Available offers
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <input
@@ -301,7 +391,7 @@ export default function CartPage() {
                     ? "bg-gray-100 text-gray-400"
                     : "bg-green-500 text-white"
                   }`} 
-              disabled = {!couponCode.trim()}>
+              disabled={!couponCode.trim()}>
               Apply
             </button>
           </div>

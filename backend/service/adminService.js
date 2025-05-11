@@ -80,13 +80,13 @@ const getAllOrders = async () => {
     try {
         console.log('Fetching all orders');
         const orders = await Order.find()
-            .populate('user', 'name email') // Populate user details
-            .sort({ createdAt: -1 }); // Sort by newest first
-        
-        console.log(`Found ${orders.length} orders`);
+            .sort({ orderDate: -1 })
+            .populate('userId', 'name email') // Populate userId instead of user
+            .populate('products.productId', 'name price'); // Populate product details
+
         return orders;
     } catch (error) {
-        console.error('Error fetching orders:', error);
+        console.error('Error fetching all orders:', error);
         throw new Error('Error fetching orders');
     }
 }

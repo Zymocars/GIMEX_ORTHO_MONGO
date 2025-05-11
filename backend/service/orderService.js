@@ -1,31 +1,32 @@
-const Order=require('../model/order');
-const User=require('../model/user');
+const mongoose = require('mongoose');
+const Order = require('../model/order');
+const User = require('../model/user');
 
-const createOrder=async(userId,orderData)=>{
+const createOrder = async (userId, orderData) => {
     try {
-        console.log('Creating order for user:', userId);
-
-        // Get user's shipping details
-        const user = await User.findById(userId);
-        if (!user.shippingDetails) {
-            throw new Error('Shipping details not found');
-        }
-
-        // Create order with user's shipping details
-        const order = await Order.create({
-            userId,
-            products: orderData.products,
-            deliveryAddress: user.shippingDetails,
-            deliveryFee: orderData.deliveryFee || 0,
-            couponApplied: orderData.couponApplied,
-            couponDiscountAmount: orderData.couponDiscountAmount || 0,
-            totalAmount: orderData.totalAmount
+        // Validate productId
+        orderData.products.forEach(product => {
+            if (!mongoose.Types.ObjectId.isValid(product.productId)) {
+                throw new Error(`Invalid productId: ${product.productId}`);
+            }
         });
 
-        console.log('Order created successfully:', order._id);
-        return order;
+        console.log('Saving order to database');
+        const newOrder = new Order({
+            userId,
+            products: orderData.products,
+            deliveryAddress: orderData.deliveryAddress,
+            deliveryFee: orderData.deliveryFee,
+            couponApplied: orderData.couponCode,
+            couponDiscountAmount: orderData.couponDiscountAmount,
+            totalAmount: orderData.totalAmount,
+            status: 'Processing',
+            orderDate: new Date(),
+        });
+
+        return await newOrder.save();
     } catch (error) {
-        console.error('Error creating order:', error);
+        console.error('Error saving order:', error);
         throw new Error(error.message);
     }
 };
@@ -62,8 +63,8 @@ const deleteOrder = async (orderId) => {
 };
 
 module.exports = {
+    ...module.exports,
     createOrder,
     getUserOrders,
     deleteOrder
 };
-    
