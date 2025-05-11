@@ -49,9 +49,9 @@ export default function ProductPage() {
 
             {/* Pricing */}
             <div className="flex items-center mb-3">
-              <span className="text-xl font-bold">₹499</span>
-              <span className="text-gray-500 line-through mx-2">₹599</span>
-              <span className="text-red-600 font-medium">17% Off</span>
+              <span className="text-xl font-bold">₹44</span>
+              <span className="text-gray-500 line-through mx-2">₹49</span>
+              <span className="text-red-600 font-medium">10% Off</span>
             </div>
 
             {/* Reviews */}

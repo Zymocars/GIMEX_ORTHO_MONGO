@@ -37,7 +37,7 @@ import Users from './Pages/Users';
 import OngoingOrders from './Pages/OngoinOrders';
 import AdminRoute from './Pages/Admin';
 
-import AddProduct from './Pages/AddProduct';
+// import AddProduct from './Pages/AddProduct';
 import AdminLogin from './Pages/AdminLogin';
 
 const router = createBrowserRouter(
@@ -78,7 +78,7 @@ const router = createBrowserRouter(
         <Route path='orders' element={<Orders />} />
         <Route path='users' element={<Users />} />
         <Route path='ongoing-orders' element={<OngoingOrders />} />
-        <Route path='addProduct' element={<AddProduct />} />
+        {/* <Route path='addProduct' element={<AddProduct />} /> */}
       </Route>
 
       {/* 404 catch-all route */}

@@ -1,33 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const Users = () => {
-  // Dummy users data (you can fetch this from your backend later)
-  const users = [
-    {
-      id: 1,
-      name: "Rahul Kumar",
-      email: "rahul@example.com",
-      role: "Customer",
-      status: "Active",
-      joined: "2024-12-15",
-    },
-    {
-      id: 2,
-      name: "Priya Sharma",
-      email: "priya@example.com",
-      role: "Customer",
-      status: "Inactive",
-      joined: "2025-01-20",
-    },
-    {
-      id: 3,
-      name: "Admin User",
-      email: "admin@example.com",
-      role: "Admin",
-      status: "Active",
-      joined: "2023-06-10",
-    },
-  ];
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}api/admin/getallusers`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`, // Include the token here
+            },
+        });
+
+        if (response.status === 304) {
+            console.log('Using cached data');
+            return; // Exit early if no new data is available
+        }
+
+        const data = await response.json();
+        console.log('Users fetched successfully:', data);
+        setUsers(data.data); // Update the users state
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   return (
     <div className="p-6">
@@ -48,7 +50,7 @@ const Users = () => {
           <tbody className="text-white">
             {users.map((user, index) => (
               <tr
-                key={user.id}
+                key={user.id || index} // Use user.id if available, otherwise fallback to index
                 className="border-t border-gray-700 hover:bg-gray-700 transition"
               >
                 <td className="px-6 py-4">{index + 1}</td>
