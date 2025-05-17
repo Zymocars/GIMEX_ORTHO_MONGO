@@ -2,7 +2,13 @@ const User= require('../model/user.js')
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
+const { defineSecret } = require("firebase-functions/params");
+const dotenv = require('dotenv');
+dotenv.config();
 //get user by id service
+
+const frontendUrl = process.env.FRONTEND_URL || defineSecret("FRONTEND_URL").value();
+
 const getUserById=async(userId) => {
     return await User.findById(userId).select('-password'); 
 };
@@ -25,7 +31,7 @@ const forgotPassword = async (email) => {
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
-    const resetLink = `${process.env.FRONTEND_URL}/resetpassword/${token}`; // Replace with your frontend URL that opens the reset password page
+    const resetLink = `${frontendUrl}/resetpassword/${token}`;
     console.log("RESET LINK (DEV):", resetLink);
   const transporter = nodemailer.createTransport({
     service: 'gmail',

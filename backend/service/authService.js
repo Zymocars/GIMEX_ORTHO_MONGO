@@ -1,16 +1,18 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../model/user.js');
+const { defineSecret } = require("firebase-functions/params");
 const dotenv = require('dotenv');
+dotenv.config();
 
+const jwtSecret = process.env.JWT_SECRET || defineSecret("JWT_SECRET").value();
 
 const generateToken = (user) => {
-  const JWT_SECRET=process.env.JWT_SECRET
     console.log('Generating token')
     try {
       const token = jwt.sign(
           { id: user._id, isAdmin: user.isAdmin },
-          JWT_SECRET,
+          jwtSecret,
           { expiresIn: '7d' }
       );
       console.log('Token generated successfully');

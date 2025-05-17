@@ -1,4 +1,9 @@
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
+const { defineSecret } = require("firebase-functions/params");
+
+const jwtSecret = process.env.JWT_SECRET || defineSecret("JWT_SECRET").value();
 
 const adminAuth = async (req, res, next) => {
     try {
@@ -12,8 +17,8 @@ const adminAuth = async (req, res, next) => {
 
         // Verify token
         const token = req.headers.authorization.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
+        const decoded = jwt.verify(token, jwtSecret);
+
         console.log('Admin check for user:', decoded);
 
         // Check if user is admin

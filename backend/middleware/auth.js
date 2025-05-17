@@ -1,5 +1,9 @@
 const jwt=require('jsonwebtoken');
 const User=require('../model/user.js');
+const dotenv = require('dotenv');
+dotenv.config();
+const { defineSecret } = require("firebase-functions/params");
+const jwtSecret = process.env.JWT_SECRET || defineSecret("JWT_SECRET").value();
 
 const auth=async (req, res, next) => {
     let token;
@@ -9,7 +13,7 @@ const auth=async (req, res, next) => {
              token=req.headers.authorization.split(' ')[1]; //Bearer token
 
             //verify token
-            decoded=jwt.verify(token,process.env.JWT_SECRET); //verify token using secret key
+            decoded=jwt.verify(token,jwtSecret); //verify token using secret key
             console.log('Decoded token:', decoded);
             req.user = {
             id: decoded.id,
