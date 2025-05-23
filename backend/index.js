@@ -4,6 +4,7 @@ const cors = require("cors");
 const admin = require("firebase-admin");
 const connectDb = require("./config/db");
 const routes = require("./routes/route.js");
+const authRoutes = require('./routes/authRoutes');
 
 // Initialize Firebase Admin
 admin.initializeApp();
@@ -39,6 +40,7 @@ app.use(async (req, res, next) => {
 });
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api', routes);
 
 // Default route
