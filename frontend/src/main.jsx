@@ -27,7 +27,7 @@ import PersonalInfo from './Pages/PersonalInfo';
 // import AccountSettings from './Pages/AccountSettings';
 import UserOngoingOrders from './components/UserOngoinOrders';
 import UserOrders from './components/Orders';
-// import UserLogout from './components/LogOut';
+import UserLogout from './components/LogOut';
 
 // Admin imports
 import Products from './Pages/Products';
@@ -64,7 +64,7 @@ const router = createBrowserRouter(
         {/* <Route path='account_settings' element={<AccountSettings />} /> */}
         <Route path='user-orders' element={<UserOrders />} />
         <Route path='user-ongoing-orders' element={<UserOngoingOrders />} />
-        {/* <Route path='user-logout' element={<UserLogout />} /> */}
+        <Route path='user-logout' element={<UserLogout />} />
       </Route>
 
       {/* Admin Login Route - Not protected by AdminRoute */}
