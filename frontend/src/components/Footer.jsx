@@ -1,5 +1,5 @@
 import React from "react";
-import { Link,NavLink} from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import {
   FaTachometerAlt,
   FaBoxOpen,
@@ -17,8 +17,6 @@ const Footer = () => {
       title: "Quick Links",
       links: [
         { name: "Contact", href: "/contact" },
-        { name: "FAQ", href: "/faqs" },
-        { name: "Help", href: "/contact" },
         { name: "About", href: "/about" },
       ],
     },
@@ -31,7 +29,10 @@ const Footer = () => {
       title: "Follow Us",
       links: [
         { name: "Facebook", href: "#" },
-        { name: "Instagram", href: "https://www.instagram.com/zymo.app?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" },
+        {
+          name: "Instagram",
+          href: "https://www.instagram.com/zymo.app?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+        },
         { name: "LinkedIn", href: "https://www.linkedin.com/company/zymoapp/" },
       ],
     },
@@ -39,6 +40,18 @@ const Footer = () => {
       title: "For Queries",
       text: "Mail us at:",
       email: "gimex@gimexortho.com",
+    },
+    {
+      title: "Policies",
+      links: [
+        { name: "Privacy & Policy", href: "/privacy-policy" },
+        { name: "Terms of Service", href: "/terms-of-service" },
+        {
+          name: "Cancellation, Refund Policy and Shipping Policy",
+          href: "/cancellation-refund-policy",
+        },
+        // { name: "Shipping and Return Policy", href: "/shipping-return-policy" },
+      ],
     },
   ];
 
@@ -52,23 +65,23 @@ const Footer = () => {
   //   { path: "/admin/ongoing-orders", label: "Ongoing Orders", icon: <FaClock /> },
   // ];
 
-
   return (
     // <footer className="bg-[#303030] text-white py-8 w-full overflow-hidden">
     <footer className="bg-black text-white py-8 w-full overflow-hidden">
       <div className="md:max-w-7xl mx-auto px-6">
         {/* Grid Layout */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
           {footerLinks.map((section, index) => (
             <div key={index}>
               <h2 className="text-lg font-semibold mb-4">{section.title}</h2>
-              
+
               {/* If section has links */}
               {section.links && (
                 <ul className="space-y-2">
                   {section.links.map((link, i) => (
                     <li key={i}>
-                     <Link to={link.href}>{link.name}</Link>
+                      <Link to={link.href}>{link.name}</Link>
                     </li>
                   ))}
                 </ul>
@@ -79,7 +92,10 @@ const Footer = () => {
 
               {/* If section has an action button */}
               {section.action && (
-                <a href={section.action.href} className="inline-block mt-2 text-gray-400 hover:text-white">
+                <a
+                  href={section.action.href}
+                  className="inline-block mt-2 text-gray-400 hover:text-white"
+                >
                   {section.action.text}
                 </a>
               )}
@@ -94,8 +110,8 @@ const Footer = () => {
           ))}
         </div>
 
-         {/* Admin Footer Navigation */}
-         {/* <div className="mt-8">
+        {/* Admin Footer Navigation */}
+        {/* <div className="mt-8">
           <h2 className="text-lg font-semibold mb-4">Admin Navigation</h2>
           <nav className="flex flex-wrap justify-center gap-6">
             {adminNavItems.map((item) => (
@@ -115,7 +131,6 @@ const Footer = () => {
           </nav>
         </div> */}
 
-
         {/* Divider Line */}
         {/* <div className="border-t border-gray-600 my-6"></div>
 
@@ -123,9 +138,9 @@ const Footer = () => {
         <div className="text-center text-gray-400">
           &copy; {new Date().getFullYear()} Vehicle Accessories. All Rights Reserved.
         </div> */}
-      {/* </div> */}
+        {/* </div> */}
       </div>
     </footer>
-)
-}
+  );
+};
 export default Footer;

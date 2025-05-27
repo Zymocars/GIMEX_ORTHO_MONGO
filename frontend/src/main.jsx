@@ -28,6 +28,9 @@ import PersonalInfo from './Pages/PersonalInfo';
 import UserOngoingOrders from './components/UserOngoinOrders';
 import UserOrders from './components/Orders';
 import UserLogout from './components/LogOut';
+import PrivacyPolicy from './components/Privacy_Policy';
+import TermsOfService from './components/TermsOfServices';
+import CancellationRefundPolicy from './components/Cancelation';
 
 // Admin imports
 import Products from './Pages/Products';
@@ -65,6 +68,9 @@ const router = createBrowserRouter(
         <Route path='user-orders' element={<UserOrders />} />
         <Route path='user-ongoing-orders' element={<UserOngoingOrders />} />
         <Route path='user-logout' element={<UserLogout />} />
+        <Route path='privacy-policy' element={<PrivacyPolicy />} />
+        <Route path='terms-of-service' element={<TermsOfService />} />
+        <Route path='cancellation-refund-policy' element={<CancellationRefundPolicy />} />
       </Route>
 
       {/* Admin Login Route - Not protected by AdminRoute */}
