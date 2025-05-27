@@ -29,7 +29,7 @@ const AdminLogin = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
-        credentials: 'include', // Include cookies in the request
+        // credentials: 'include', // Include cookies in the request
       });
 
       console.log("login response status:",response.status);

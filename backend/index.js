@@ -12,7 +12,12 @@ admin.initializeApp();
 const app = express();
 
 // Middleware
-app.use(cors({ origin: true }));
+app.use(cors({ 
+  origin: true, // This allows any origin
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
