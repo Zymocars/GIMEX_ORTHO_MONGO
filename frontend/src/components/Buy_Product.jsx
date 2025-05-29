@@ -1,10 +1,80 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [isReadMore, setIsReadMore] = useState(false);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
   const navigate = useNavigate();
+  const { productId } = useParams();
+  
+  // API URL - same as your admin component
+  const API_URL = `${import.meta.env.VITE_REACT_APP_API_URL}api`;
+
+  // Default fallback product data (your current hardcoded data)
+  const defaultProduct = {
+    _id: 'default',
+    name: 'GIMEX Ortho Plus',
+    price: 44,
+    originalPrice: 49,
+    discount: 10,
+    reviews: 42,
+    description: 'Health Booster for bone strength and joint mobility',
+    image: '/images/Gimex_1.png',
+    stock: 100,
+    category: 'Health'
+  };
+
+  // Fetch single product data
+  const fetchProduct = async () => {
+    try {
+      setLoading(true);
+      
+      // If no productId, use default product
+      if (!productId) {
+        // setProduct(defaultProduct);
+        // setLoading(false);
+        setError("No product ID provided")
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/products/${productId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        setProduct(data.data);
+      } else {
+        // Fallback to default product if API fails
+        console.warn("API failed, using default product");
+        // setProduct(defaultProduct);
+      }
+    } catch (err) {
+      // Fallback to default product on any error
+      console.warn("Error fetching product, using default:", err);
+      // setProduct(defaultProduct);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch product on component mount
+  useEffect(() => {
+    fetchProduct();
+  }, [productId]);
+
   const handleCart = () => {
     navigate("/Cart_Page");
   };
@@ -14,7 +84,9 @@ export default function ProductPage() {
   };
 
   const increaseQuantity = () => {
-    setQuantity(quantity + 1);
+    if (product && quantity < product.stock) {
+      setQuantity(quantity + 1);
+    }
   };
 
   const decreaseQuantity = () => {
@@ -23,41 +95,90 @@ export default function ProductPage() {
     }
   };
 
+  // Calculate discount percentage and original price if not provided
+  const calculatePricing = (currentPrice) => {
+    const originalPrice = Math.round(currentPrice * 1.11); // Assuming ~10% discount
+    const discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    return { originalPrice, discount };
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error || "Product not found"}</p>
+          <button 
+            onClick={() => navigate('/')}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Go Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const { originalPrice, discount } = product.originalPrice 
+    ? { originalPrice: product.originalPrice, discount: product.discount || 0 }
+    : calculatePricing(product.price);
+
   return (
-    <div className="w-full min-h-screen py-6 bg-white ">
+    <div className="w-full min-h-screen py-6 bg-white">
       <div className="max-w-xl mx-auto px-4">
-        {/* Main product container - flex-col by default (mobile), flex-row for md and up */}
         <div className="flex flex-col md:flex-row md:space-x-8">
           {/* Left side - Product Image */}
-          {/* <div className="w-full md:w-1/2 bg-lime-300 h-20 object-contain "> */}
           <div className="w-full md:w-1/2 mb-6 md:mb-0 flex">
             <img
-              src="/images/Gimex_1.png"
-              alt="Ortho Powder Pack"
-              // className=" w-full h-[400px]"
-              className=" w-full h-auto object-contain max-h-[500px]"
+              src={product.image || "/images/Gimex_1.png"}
+              alt={product.name}
+              className="w-full h-auto object-contain max-h-[500px]"
+              onError={(e) => {
+                e.target.src = "/images/Gimex_1.png"; // Fallback image
+              }}
             />
           </div>
 
           {/* Right side - Product Details */}
-          {/* <div className="w-full md:w-full pt-4 px-4 md:pl-2"> */}
           <div className="w-full md:w-1/2">
             {/* Product Title */}
             <h1 className="text-2xl md:text-3xl font-bold mb-3">
-              GIMEX Ortho Plus
+              {product.name}
             </h1>
 
-            {/* Pricing */}
+            {/* Pricing - Now Dynamic */}
             <div className="flex items-center mb-3">
-              <span className="text-xl font-bold">₹44</span>
-              <span className="text-gray-500 line-through mx-2">₹49</span>
-              <span className="text-red-600 font-medium">10% Off</span>
+              <span className="text-xl font-bold">₹{Number(product.price).toFixed(0)}</span>
+              {originalPrice > product.price && (
+                <>
+                  <span className="text-gray-500 line-through mx-2">₹{originalPrice}</span>
+                  <span className="text-red-600 font-medium">{discount}% Off</span>
+                </>
+              )}
             </div>
 
             {/* Reviews */}
             <div className="mb-6">
-              <span className="text-gray-600">(42 reviews)</span>
+              <span className="text-gray-600">({product.reviews || 0} reviews)</span>
             </div>
+
+            {/* Stock Status - Only show if stock info is available */}
+            {product.stock !== undefined && (
+              <div className="mb-4">
+                {product.stock > 0 ? (
+                  <span className="text-green-600">In Stock</span>
+                ) : (
+                  <span className="text-red-600">Out of Stock</span>
+                )}
+              </div>
+            )}
 
             {/* Side by side equal width buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -65,27 +186,36 @@ export default function ProductPage() {
               <div className="w-full sm:w-1/2">
                 <button
                   onClick={handleCart}
-                  className="w-full border border-gray-300 py-3 px-4 text-center rounded hover:bg-gray-50 transition-colors"
+                  disabled={product.stock === 0}
+                  className={`w-full border py-3 px-4 text-center rounded transition-colors ${
+                    product.stock === 0 
+                      ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+                      : 'border-gray-300 hover:bg-gray-50'
+                  }`}
                 >
-                  Go to Cart
+                  {product.stock === 0 ? 'Out of Stock' : 'Go to Cart'}
                 </button>
               </div>
 
               {/* Quantity selector */}
-              {/* <div className="w-full sm:w-1/2 mt-2 md:mt-0"> */}
               <div className="w-full sm:w-1/2">
-                {/* <div className="flex items-center justify-between border border-gray-300 rounded-full h-[54px] w-full md:w-[260px]"> */}
                 <div className="flex items-center justify-between border border-gray-300 rounded-full h-14">
                   <button
                     onClick={decreaseQuantity}
-                    className="w-12 h-full flex items-center justify-center text-black font-bold"
+                    disabled={product.stock === 0}
+                    className={`w-12 h-full flex items-center justify-center font-bold ${
+                      product.stock === 0 ? 'text-gray-400' : 'text-black'
+                    }`}
                   >
                     −
                   </button>
                   <div className="flex-1 text-center">{quantity}</div>
                   <button
                     onClick={increaseQuantity}
-                    className="w-12 h-full flex items-center justify-center text-black font-bold"
+                    disabled={product.stock === 0 || (product.stock && quantity >= product.stock)}
+                    className={`w-12 h-full flex items-center justify-center font-bold ${
+                      product.stock === 0 || (product.stock && quantity >= product.stock) ? 'text-gray-400' : 'text-black'
+                    }`}
                   >
                     +
                   </button>
@@ -96,6 +226,9 @@ export default function ProductPage() {
             {/* Product Description */}
             <div>
               <h2 className="text-xl font-bold mb-2">Product Description</h2>
+              {product.description && (
+                <p className="mb-3 text-gray-700">{product.description}</p>
+              )}
               <h3 className="font-medium mb-3">Uses</h3>
 
               <ul className="space-y-2">

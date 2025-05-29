@@ -36,6 +36,23 @@ const updateProduct = async (productId, updateData) => {
     }
 };
 
+const getProductById = async (productId) => {
+    try {
+        console.log('Fetching product by ID:', productId);
+        const product = await Product.findById(productId);
+        
+        if (!product) {
+            throw new Error('Product not found');
+        }
+        
+        console.log('Product found:', product);
+        return product;
+    } catch (error) {
+        console.error('Error fetching product by ID:', error);
+        throw new Error(error.message);
+    }
+};
+
 // Delete product
 const deleteProduct = async (productId) => {
     try {
@@ -97,5 +114,6 @@ module.exports = {
     deleteProduct,
     getAllProducts,
     getAllUsers,
-    getAllOrders
+    getAllOrders,
+    getProductById
 };
