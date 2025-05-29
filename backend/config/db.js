@@ -1,19 +1,18 @@
 const mongoose = require('mongoose');
-const { defineSecret } = require("firebase-functions/params");
 const dotenv = require('dotenv');
 dotenv.config();
 
-const mongoUri = process.env.MONGO_URI || defineSecret("MONGO_URI").value();
-//connect to db
+const mongoUri = process.env.MONGO_URI;
+console.log(`Mongo URI: ${mongoUri}`); // Debugging line to check the URI
+
 const connectDb = async () => {
     try {
         const conn = await mongoose.connect(mongoUri);
         console.log(`MongoDB Connected: ${conn.connection.host}`);
-    }
-    catch(error){
+    } catch (error) {
         console.error(`Error: ${error.message}`);
         process.exit(1);
     }
-}
+};
 
 module.exports = connectDb;

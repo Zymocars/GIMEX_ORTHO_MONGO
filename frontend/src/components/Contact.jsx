@@ -59,9 +59,12 @@ export default function Contact() {
                     name="country"
                     className="col-start-1 row-start-1 w-full rounded-l-md border-0 py-2 pr-7 pl-3.5 text-base text-gray-900 focus:outline-none sm:text-sm"
                   >
+                    <option>IN</option>
                     <option>US</option>
                     <option>CA</option>
                     <option>EU</option>
+                    <option>UK</option>
+                    <option>AU</option>
                   </select>
                   <ChevronDown
                     aria-hidden="true"
@@ -105,7 +108,7 @@ export default function Contact() {
             onClick={handleSubmit}
             className="rounded-md bg-blue-500 mt-2 px-6 py-3 text-sm font-bold text-gray-900 shadow-sm hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors duration-200"
           >
-          Submit
+            Submit
           </button>
         </div>
       </div>

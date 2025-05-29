@@ -13,7 +13,8 @@ import { useNavigate } from'react-router-dom';
 export default function Home_page() {
   const navigate = useNavigate();
   const handleBuyNow = () => {
-    navigate('/Buy_Product');
+    navigate(`/product/6836a247d1c1e405c2c4dffc`);
+
   };
   
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);

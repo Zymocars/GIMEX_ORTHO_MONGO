@@ -11,10 +11,11 @@ const Products = () => {
     price: "",
     stock: "",
     description: "",
-    image: ""
+    image: "",
   });
   const [editMode, setEditMode] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   // API URL - replace with your actual backend URL
   const API_URL = `${import.meta.env.VITE_REACT_APP_API_URL}api`; // You can replace this with your actual backend URL
@@ -23,8 +24,8 @@ const Products = () => {
   // Configure headers for authentication
   const authHeader = {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   };
 
   // Fetch all products
@@ -32,14 +33,14 @@ const Products = () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/admin/products`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
       const data = await response.json();
-      
+
       if (data.success) {
         setProducts(data.data);
       } else {
@@ -56,60 +57,140 @@ const Products = () => {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Debug: Log what user is typing
+    if (name === "price") {
+      console.log("User typed price:", value);
+    }
+
     setFormData({
       ...formData,
-      [name]: name === "price" || name === "stock" ? parseFloat(value) : value
+      [name]: value, // Keep original value without modification
     });
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setError(null); // Clear previous errors
+
     try {
+      // Convert price and stock to numbers only when submitting
+      const submitData = {
+        ...formData,
+        price: parseFloat(formData.price) || 0,
+        stock: parseInt(formData.stock) || 0,
+      };
+
+      console.log("=== FORM SUBMISSION START ===");
+      console.log("Form data price:", formData.price);
+      console.log("Submitting price:", submitData.price);
+      console.log("Full submit data:", submitData);
+      console.log("Edit mode:", editMode);
+      console.log("Current product ID:", currentProductId);
+
       if (editMode) {
-        const response = await fetch(`${API_URL}/admin/products/${currentProductId}`, {
-          method: 'PUT',
+        const url = `${API_URL}/admin/products/${currentProductId}`;
+        console.log("PUT request to:", url);
+
+        const response = await fetch(url, {
+          method: "PUT",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(submitData),
         });
-        const data = await response.json();
-        
-        if (data.success) {
-          // Update the product in the state
+
+        console.log("Response status:", response.status);
+        console.log(
+          "Response headers:",
+          Object.fromEntries(response.headers.entries())
+        );
+
+        const responseText = await response.text();
+        console.log("Raw response:", responseText);
+
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error("Failed to parse response as JSON:", parseError);
+          throw new Error("Invalid JSON response from server");
+        }
+
+        console.log("Parsed response data:", data);
+
+        if (response.ok && data.success) {
           setProducts(
             products.map((product) =>
               product._id === currentProductId ? data.data : product
             )
           );
           resetForm();
+          console.log("Product updated successfully");
         } else {
-          setError("Failed to update product");
+          const errorMsg =
+            data.message || data.error || `Server error: ${response.status}`;
+          setError(errorMsg);
+          console.error("Update failed:", data);
         }
       } else {
-        const response = await fetch(`${API_URL}/admin/products`, {
-          method: 'POST',
+        const url = `${API_URL}/admin/products`;
+        console.log("POST request to:", url);
+
+        const response = await fetch(url, {
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(submitData),
         });
-        const data = await response.json();
-        
-        if (data.success) {
-          // Add the new product to the state
+
+        console.log("Response status:", response.status);
+
+        const responseText = await response.text();
+        console.log("Raw response:", responseText);
+
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error("Failed to parse response as JSON:", parseError);
+          throw new Error("Invalid JSON response from server");
+        }
+
+        console.log("Parsed response data:", data);
+
+        if (response.ok && data.success) {
           setProducts([...products, data.data]);
           resetForm();
+          console.log("Product created successfully");
         } else {
-          setError("Failed to add product");
+          const errorMsg =
+            data.message || data.error || `Server error: ${response.status}`;
+          setError(errorMsg);
+          console.error("Create failed:", data);
         }
       }
     } catch (err) {
-      setError("Error submitting form");
-      console.error("Error submitting form:", err);
+      console.error("=== REQUEST ERROR ===");
+      console.error("Error type:", err.name);
+      console.error("Error message:", err.message);
+      console.error("Full error:", err);
+
+      if (err.name === "TypeError" && err.message.includes("fetch")) {
+        setError(
+          "Network error: Cannot connect to server. Please check if the backend is running."
+        );
+      } else {
+        setError(err.message || "Error submitting form");
+      }
+    } finally {
+      setSubmitting(false);
+      console.log("=== FORM SUBMISSION END ===");
     }
   };
 
@@ -118,14 +199,14 @@ const Products = () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         const response = await fetch(`${API_URL}/admin/products/${id}`, {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         });
         const data = await response.json();
-        
+
         if (data.success) {
           // Remove the product from the state
           setProducts(products.filter((product) => product._id !== id));
@@ -141,13 +222,16 @@ const Products = () => {
 
   // Handle edit product
   const handleEdit = (product) => {
+    // Debug: Log the original price from database
+    console.log("Original price from DB:", product.price);
+
     setFormData({
       name: product.name,
       category: product.category,
-      price: product.price,
-      stock: product.stock,
+      price: product.price.toString(), // Keep original precision
+      stock: product.stock.toString(),
       description: product.description || "",
-      image: product.image || ""
+      image: product.image || "",
     });
     setCurrentProductId(product._id);
     setEditMode(true);
@@ -162,7 +246,7 @@ const Products = () => {
       price: "",
       stock: "",
       description: "",
-      image: ""
+      image: "",
     });
     setEditMode(false);
     setCurrentProductId(null);
@@ -229,10 +313,11 @@ const Products = () => {
               <div>
                 <label className="block text-gray-300 mb-2">Price (₹)</label>
                 <input
-                  type="number"
+                  type="text"
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
+                  placeholder="Enter price (e.g., 75 or 75.50)"
                   className="w-full bg-gray-700 text-white border border-gray-600 rounded py-2 px-3 focus:outline-none focus:border-green-500"
                   required
                 />
@@ -244,6 +329,7 @@ const Products = () => {
                   name="stock"
                   value={formData.stock}
                   onChange={handleChange}
+                  min="0"
                   className="w-full bg-gray-700 text-white border border-gray-600 rounded py-2 px-3 focus:outline-none focus:border-green-500"
                   required
                 />
@@ -261,8 +347,8 @@ const Products = () => {
               <div className="md:col-span-2">
                 <label className="block text-gray-300 mb-2">Image URL</label>
                 <input
-                  type="text"
-                  name="image"
+                  type="file"
+                  accept="image/*"
                   value={formData.image}
                   onChange={handleChange}
                   className="w-full bg-gray-700 text-white border border-gray-600 rounded py-2 px-3 focus:outline-none focus:border-green-500"
@@ -279,9 +365,14 @@ const Products = () => {
               </button>
               <button
                 type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
+                disabled={submitting}
+                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-500 text-white py-2 px-4 rounded"
               >
-                {editMode ? "Update Product" : "Add Product"}
+                {submitting
+                  ? "Saving..."
+                  : editMode
+                  ? "Update Product"
+                  : "Add Product"}
               </button>
             </div>
           </form>
@@ -316,7 +407,9 @@ const Products = () => {
                     <td className="px-6 py-4">{index + 1}</td>
                     <td className="px-6 py-4">{product.name}</td>
                     <td className="px-6 py-4">{product.category}</td>
-                    <td className="px-6 py-4">₹{product.price}</td>
+                    <td className="px-6 py-4">
+                      ₹{Number(product.price).toFixed(2)}
+                    </td>
                     <td className="px-6 py-4">{product.stock}</td>
                     <td className="px-6 py-4">
                       <div className="flex space-x-2">
