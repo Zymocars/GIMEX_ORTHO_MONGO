@@ -5,6 +5,7 @@ const admin = require("firebase-admin");
 const connectDb = require("./config/db");
 const routes = require("./routes/route.js");
 const authRoutes = require('./routes/authRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 // Initialize Firebase Admin
 admin.initializeApp();
@@ -47,6 +48,7 @@ app.use(async (req, res, next) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', routes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Default route
 app.get('/', (req, res) => {
