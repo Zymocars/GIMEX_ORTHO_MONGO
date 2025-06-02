@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const orderSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   products: [{
@@ -18,7 +20,16 @@ const orderSchema = new mongoose.Schema({
     state: { type: String, required: true },
     pincode: { type: String, required: true },
   },
-  status: { type: String, enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'], default: 'Pending' },
+  status: { 
+    type: String, 
+    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'], 
+    default: 'Pending' 
+  },
   orderDate: { type: Date, default: Date.now },
-  estimatedDelivery: { type: Date }, // Add this field
+  estimatedDelivery: { type: Date }
 });
+
+const Order = mongoose.model('Order', orderSchema);
+console.log('Order model defined:', Order); // Debug log
+
+module.exports = Order;
