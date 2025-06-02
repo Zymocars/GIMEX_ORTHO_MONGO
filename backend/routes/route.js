@@ -1,12 +1,18 @@
 const router = require('express').Router(); 
-const auth = require('../middleware/auth.js'); 
+const {auth} = require('../middleware/auth.js'); 
 const authController = require('../controller/authController.js'); 
 const userController = require('../controller/userController.js'); 
 const adminAuth = require('../middleware/adminAuth.js'); 
 const adminController = require('../controller/adminController.js'); 
-const orderController = require('../controller/orderController.js');
-
+const orderController = require('../controller/orderController.js');// Import dashboard controller
 // Import your service functions (you'll need to create this service file)
+
+// Add this debugging code after your imports
+console.log('authController methods:', Object.keys(authController));
+console.log('userController methods:', Object.keys(userController));
+console.log('adminController methods:', Object.keys(adminController));
+console.log('orderController methods:', Object.keys(orderController));
+
 const {
     getProductById,
     getAllProducts

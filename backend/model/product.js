@@ -1,49 +1,63 @@
-const mongoose=require('mongoose');
-const bcrypt=require('bcryptjs');
+const mongoose = require('mongoose');
 
-const ProductSchema = mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: [true, 'Product name is required'],
-            trim: true
-        },
-        category: {
-            type: String,
-            required: [true, 'Product category is required'],
-            enum: ['Health', 'Fitness', 'Wellness', 'Nutrition'], 
-            default: 'Health'
-        },
-        price: {
-            type: Number,
-            required: [true, 'Product price is required'],
-            min: [0, 'Price cannot be negative']
-        },
-        stock: {
-            type: Number,
-            required: [true, 'Product stock is required'],
-            min: [0, 'Stock cannot be negative'],
-            default: 0
-        },
-        description: {
-            type: String,
-            required: false
-        },
-        image: {
-            type: String,
-            required: false
-        },
-        isActive: {
-            type: Boolean,
-            default: true
-        }
+// Define the product schema
+const productSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  category: {
+    type: String,
+    required: true
+  },
+  brand: {
+    type: String,
+    required: true
+  },
+  stock: {
+    type: Number,
+    required: true,
+    min: 0,
+    default: 0
+  },
+  images: [{
+    type: String
+  }],
+  ratings: {
+    average: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
     },
-    {
-        timestamps: true
+    count: {
+      type: Number,
+      default: 0
     }
-);
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
+}, {
+  timestamps: true
+});
 
-ProductSchema.index({ name: 'text', category: 'text' });
+// Add indexes for better performance
+productSchema.index({ name: 'text', description: 'text' });
+productSchema.index({ category: 1 });
+productSchema.index({ brand: 1 });
+productSchema.index({ price: 1 });
 
-const Product = mongoose.model('Product', ProductSchema);
-module.exports = Product;
+// Export the model - check if it exists first to prevent overwrite error
+module.exports = mongoose.models.Product || mongoose.model('Product', productSchema);
