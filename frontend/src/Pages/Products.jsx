@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -16,17 +18,11 @@ const Products = () => {
   const [editMode, setEditMode] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   // API URL - replace with your actual backend URL
-  const API_URL = `${import.meta.env.VITE_REACT_APP_API_URL}api`; // You can replace this with your actual backend URL
+  const API_URL = `${import.meta.env.VITE_REACT_APP_API_URL}api`;
   const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
-
-  // Configure headers for authentication
-  const authHeader = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
 
   // Fetch all products
   const fetchProducts = async () => {
@@ -260,14 +256,23 @@ const Products = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold">Product Details</h1>
+      <div className="flex items-center mb-6">
         <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded"
+          onClick={() => navigate('/admin/dashboard')}
+          className="mr-4 p-2 rounded-full hover:bg-gray-700 transition-colors"
+          aria-label="Back to Dashboard"
         >
-          {showForm ? "Cancel" : "Add New Product"}
+          <ArrowLeftIcon className="h-6 w-6 text-black" />
         </button>
+        <div className="flex justify-between items-center w-full">
+          <h1 className="text-3xl px-6 font-semibold">Product Details</h1>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded"
+          >
+            {showForm ? "Cancel" : "Add New Product"}
+          </button>
+        </div>
       </div>
 
       {/* Error message */}

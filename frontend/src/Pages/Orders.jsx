@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -8,6 +9,7 @@ const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchOrders();
@@ -73,7 +75,6 @@ const Orders = () => {
     setSelectedOrder(order);
     setShowOrderDetails(true);
   };
-  
 
   const OrderDetailsModal = ({ order, onClose }) => {
     if (!order) return null;
@@ -188,7 +189,16 @@ const Orders = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-semibold mb-6">Order Details</h1>
+      <div className="flex items-center mb-6">
+        <button
+          onClick={() => navigate('/admin/dashboard')}
+          className="mr-4 p-2 rounded-full hover:bg-gray-700 transition-colors"
+          aria-label="Back to Dashboard"
+        >
+          <ArrowLeftIcon className="h-6 w-6 text-black" />
+        </button>
+        <h1 className="text-3xl px-6 font-semibold">Order Details</h1>
+      </div>
 
       {loading ? (
         <div className="text-center py-4">

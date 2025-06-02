@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState({ status: 'Active', role: 'User' });
+  const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
@@ -44,7 +47,16 @@ const Users = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-semibold mb-6">User Details</h1>
+      <div className="flex items-center mb-6">
+        <button
+          onClick={() => navigate('/admin/dashboard')}
+          className="mr-4 p-2 rounded-full hover:bg-gray-700 transition-colors"
+          aria-label="Back to Dashboard"
+        >
+          <ArrowLeftIcon className="h-6 w-6 text-black" />
+        </button>
+        <h1 className="text-3xl px-6 font-semibold">User Details</h1>
+      </div>
       <div className="mb-4">
         <label className="mr-2">Status:</label>
         <select
