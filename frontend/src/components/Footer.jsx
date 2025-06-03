@@ -11,7 +11,6 @@ import {
 } from "react-icons/fa";
 
 const Footer = () => {
-  // Footer links data structure
   const footerLinks = [
     {
       title: "Quick Links",
@@ -50,47 +49,27 @@ const Footer = () => {
           name: "Cancellation, Refund Policy and Shipping Policy",
           href: "/cancellation-refund-policy",
         },
-        // { name: "Shipping and Return Policy", href: "/shipping-return-policy" },
       ],
     },
   ];
 
-  // const adminNavItems = [
-  //   { path: "/admin/login", label: "Login", icon: <FaSignInAlt /> },
-  //   { path: "/admin/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
-  //   { path: "/admin/products", label: "Products", icon: <FaBoxOpen /> },
-  //   { path: "/admin/orders", label: "Orders", icon: <FaShoppingCart /> },
-  //   { path: "/admin/users", label: "Users", icon: <FaUsers /> },
-  //    { path: "/admin/addProduct", label: "Add Product", icon: <FaPlus /> },
-  //   { path: "/admin/ongoing-orders", label: "Ongoing Orders", icon: <FaClock /> },
-  // ];
-
   return (
-    // <footer className="bg-[#303030] text-white py-8 w-full overflow-hidden">
     <footer className="bg-black text-white py-8 w-full overflow-hidden">
       <div className="md:max-w-7xl mx-auto px-6">
-        {/* Grid Layout */}
-      <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 custom-grid lg-custom:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-6 sm:bg-red-500 md:bg-blue-500 lg-custom:bg-yellow-500 lg:bg-green-500 xl:bg-purple-500">
           {footerLinks.map((section, index) => (
             <div key={index}>
               <h2 className="text-lg font-semibold mb-4">{section.title}</h2>
-
-              {/* If section has links */}
               {section.links && (
                 <ul className="space-y-2">
                   {section.links.map((link, i) => (
                     <li key={i}>
-                      <Link to={link.href}>{link.name}</Link>
+                      <Link to={link.href} className="text-gray-400 hover:text-white">{link.name}</Link>
                     </li>
                   ))}
                 </ul>
               )}
-
-              {/* If section has text */}
               {section.text && <p className="text-gray-300">{section.text}</p>}
-
-              {/* If section has an action button */}
               {section.action && (
                 <a
                   href={section.action.href}
@@ -99,8 +78,6 @@ const Footer = () => {
                   {section.action.text}
                 </a>
               )}
-
-              {/* If section has an email */}
               {section.email && (
                 <a href={`mailto:${section.email}`} className="text-gray-400">
                   {section.email}
@@ -109,38 +86,9 @@ const Footer = () => {
             </div>
           ))}
         </div>
-
-        {/* Admin Footer Navigation */}
-        {/* <div className="mt-8">
-          <h2 className="text-lg font-semibold mb-4">Admin Navigation</h2>
-          <nav className="flex flex-wrap justify-center gap-6">
-            {adminNavItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 hover:text-yellow-400 ${
-                    isActive ? "text-yellow-400" : ""
-                  }`
-                }
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
-          </nav>
-        </div> */}
-
-        {/* Divider Line */}
-        {/* <div className="border-t border-gray-600 my-6"></div>
-
-        {/* Copyright
-        <div className="text-center text-gray-400">
-          &copy; {new Date().getFullYear()} Vehicle Accessories. All Rights Reserved.
-        </div> */}
-        {/* </div> */}
       </div>
     </footer>
   );
 };
+
 export default Footer;
