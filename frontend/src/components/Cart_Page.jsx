@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { TruckIcon, TagIcon } from '@heroicons/react/24/outline';
+import { TruckIcon, TagIcon } from "@heroicons/react/24/outline";
+import { createRazorpayOrder, loadScript } from "../utils/razorpayUtils";
 
 export default function CartPage() {
   const [deliveryOption, setDeliveryOption] = useState("address");
@@ -13,24 +14,27 @@ export default function CartPage() {
     address: "",
     city: "",
     state: "",
-    pincode: ""
+    pincode: "",
   });
   const [addressAdded, setAddressAdded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [orderStatus, setOrderStatus] = useState({ success: false, message: "" });
+  const [orderStatus, setOrderStatus] = useState({
+    success: false,
+    message: "",
+  });
   const pricePerItem = 44;
   const deliveryFee = 50;
   const originalPrice = 49; // Original price before discount
   const [cartItems, setCartItems] = useState([
     {
-        _id: "645a567890abcdef12345678", // Example ObjectId
-        name: "GIMEX Ortho",
-        originalPrice: 49,
-        discountedPrice: 49 * 0.9,
-        quantity: 1,
-        image: "/images/Gimex_1.png"
-    }
-]);
+      _id: "645a567890abcdef12345678", // Example ObjectId
+      name: "GIMEX Ortho",
+      originalPrice: 49,
+      discountedPrice: 49 * 0.9,
+      quantity: 1,
+      image: "/images/Gimex_1.png",
+    },
+  ]);
 
   const handleIncrease = () => setQuantity(quantity + 1);
   const handleDecrease = () => {
@@ -41,7 +45,7 @@ export default function CartPage() {
     const { name, value } = e.target;
     setAddressInfo({
       ...addressInfo,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -56,56 +60,116 @@ export default function CartPage() {
     if (!addressAdded) {
       setOrderStatus({
         success: false,
-        message: "Please add a delivery address before placing your order."
+        message: "Please add a delivery address before placing your order.",
       });
       return false;
     }
-    
+
     // Check if all required address fields are filled
-    const requiredFields = ['name', 'mobile', 'email', 'address', 'city', 'state', 'pincode'];
+    const requiredFields = [
+      "name",
+      "mobile",
+      "email",
+      "address",
+      "city",
+      "state",
+      "pincode",
+    ];
     for (const field of requiredFields) {
       if (!addressInfo[field]) {
         setOrderStatus({
           success: false,
-          message: `Please fill in all required address fields (${field} is missing).`
+          message: `Please fill in all required address fields (${field} is missing).`,
         });
         return false;
       }
     }
-    
+
     return true;
   };
 
   const placeOrder = async () => {
+    console.log("Placing order...");
     // First validate the order
     if (!validateOrder()) {
+      return;
+    }
+    // Get authentication token if user is logged in
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setOrderStatus({
+        success: false,
+        message: "Please log in to place an order.",
+      });
+      setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
     setOrderStatus({ success: false, message: "" });
 
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
+
+    if (!res) {
+      alert("Failed to load Razorpay SDK. Please try again later.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // Get authentication token if user is logged in
-      const token = localStorage.getItem('token');
-      if (!token) {
+      const amount = parseInt(pricePerItem * quantity + deliveryFee);
+      const orderData = await createRazorpayOrder(amount, "INR", token);
+      if (!orderData || !orderData.data) {
         setOrderStatus({
           success: false,
-          message: "Please log in to place an order."
+          message: "Failed to create Razorpay order. Please try again.",
         });
         setIsLoading(false);
         return;
       }
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_PROD_KEY,
+        amount: orderData.data.amount,
+        currency: "INR",
+        name: "GIMEX Ortho",
+        description: "Order Payment",
+        image: "/images/Gimex_1.png",
+        order_id: orderData.id,
+        handler: async (response) => {
+          console.log("Payment successful:", response);
+          setOrderStatus({
+            success: true,
+            message: "Payment successful! Your order is being processed.",
+          });
+        },
+        prefill: {
+          name: addressInfo.name,
+          email: addressInfo.email,
+          contact: addressInfo.mobile,
+        },
+        notes: {
+          address: addressInfo.address,
+        },
+      };
 
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error("Error loading Razorpay SDK:", error);
+    }
+
+    try {
       // Format the order data to match the expected structure in the admin dashboard
       const orderData = {
-        products: cartItems.map(item => ({
+        products: cartItems.map((item) => ({
           productId: item._id, // Use the actual ObjectId from the product data
           name: item.name,
           originalPrice: item.originalPrice,
           discountedPrice: item.discountedPrice,
           quantity: item.quantity,
-          image: item.image
+          image: item.image,
         })),
         deliveryAddress: {
           name: addressInfo.name,
@@ -114,50 +178,56 @@ export default function CartPage() {
           address: addressInfo.address,
           city: addressInfo.city,
           state: addressInfo.state,
-          pincode: addressInfo.pincode
+          pincode: addressInfo.pincode,
         },
         deliveryFee: deliveryFee,
         totalAmount: itemTotal + deliveryFee,
         couponCode: couponCode.trim() || null,
-        orderDate: new Date().toISOString()
+        orderDate: new Date().toISOString(),
       };
 
       // Make API call to create order
-      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/user/placeorder`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(orderData)
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_REACT_APP_API_URL}api/user/placeorder`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(orderData),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok && data.success) {
         setOrderStatus({
           success: true,
-          message: "Order placed successfully! Your order ID is " + data.data._id
+          message:
+            "Order placed successfully! Your order ID is " + data.data._id,
         });
-        
+
         // Clear cart or reset order form after successful order
         setQuantity(1);
         setCouponCode("");
         // Don't reset address as user might place another order with same address
-        
+
         // You could redirect to order confirmation page here
         // window.location.href = `/order-confirmation/${data.data._id}`;
       } else {
         setOrderStatus({
           success: false,
-          message: data.message || "Failed to place your order. Please try again."
+          message:
+            data.message || "Failed to place your order. Please try again.",
         });
       }
     } catch (error) {
       console.error("Error placing order:", error);
       setOrderStatus({
         success: false,
-        message: "An error occurred while placing your order. Please try again later."
+        message:
+          "An error occurred while placing your order. Please try again later.",
       });
     } finally {
       setIsLoading(false);
@@ -180,16 +250,26 @@ export default function CartPage() {
               <TruckIcon className="h-5 w-5 text-gray-600" />
               Delivery Address
             </p>
-            <button 
+            <button
               className="text-green-700 font-semibold relative right-0"
-              onClick={() => setShowAddressModal(true)}>
+              onClick={() => setShowAddressModal(true)}
+            >
               {addressAdded ? "Edit address" : "Add address"}
             </button>
             {addressAdded && !showAddressModal && (
               <div className="mt-2 text-sm">
-                <p><span className="font-medium">Name:</span> {addressInfo.name}</p>
-                <p><span className="font-medium">Mobile:</span> {addressInfo.mobile}</p>
-                <p><span className="font-medium">Address:</span> {addressInfo.address}, {addressInfo.city}, {addressInfo.state} - {addressInfo.pincode}</p>
+                <p>
+                  <span className="font-medium">Name:</span> {addressInfo.name}
+                </p>
+                <p>
+                  <span className="font-medium">Mobile:</span>{" "}
+                  {addressInfo.mobile}
+                </p>
+                <p>
+                  <span className="font-medium">Address:</span>{" "}
+                  {addressInfo.address}, {addressInfo.city}, {addressInfo.state}{" "}
+                  - {addressInfo.pincode}
+                </p>
               </div>
             )}
 
@@ -197,7 +277,12 @@ export default function CartPage() {
               <div className="mt-4 border-t pt-4">
                 <form onSubmit={handleAddressSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name *</label>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Full Name *
+                    </label>
                     <input
                       type="text"
                       id="name"
@@ -210,7 +295,12 @@ export default function CartPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">Mobile Number *</label>
+                    <label
+                      htmlFor="mobile"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Mobile Number *
+                    </label>
                     <input
                       type="tel"
                       id="mobile"
@@ -223,7 +313,12 @@ export default function CartPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address *</label>
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Email Address *
+                    </label>
                     <input
                       type="email"
                       id="email"
@@ -236,7 +331,12 @@ export default function CartPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address *</label>
+                    <label
+                      htmlFor="address"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Address *
+                    </label>
                     <textarea
                       id="address"
                       name="address"
@@ -250,7 +350,12 @@ export default function CartPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="city" className="block text-sm font-medium text-gray-700">City *</label>
+                      <label
+                        htmlFor="city"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        City *
+                      </label>
                       <input
                         type="text"
                         id="city"
@@ -263,7 +368,12 @@ export default function CartPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="state" className="block text-sm font-medium text-gray-700">State *</label>
+                      <label
+                        htmlFor="state"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        State *
+                      </label>
                       <input
                         type="text"
                         id="state"
@@ -277,7 +387,12 @@ export default function CartPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="pincode" className="block text-sm font-medium text-gray-700">Pincode *</label>
+                    <label
+                      htmlFor="pincode"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Pincode *
+                    </label>
                     <input
                       type="text"
                       id="pincode"
@@ -312,7 +427,13 @@ export default function CartPage() {
 
         {/* Order Status Messages */}
         {orderStatus.message && (
-          <div className={`p-4 rounded-lg ${orderStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <div
+            className={`p-4 rounded-lg ${
+              orderStatus.success
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
             {orderStatus.message}
           </div>
         )}
@@ -335,9 +456,13 @@ export default function CartPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 border px-2 py-1 rounded-full">
-            <button onClick={handleDecrease} className="text-lg font-semibold">-</button>
+            <button onClick={handleDecrease} className="text-lg font-semibold">
+              -
+            </button>
             {quantity}
-            <button onClick={handleIncrease} className="text-lg font-semibold">+</button>
+            <button onClick={handleIncrease} className="text-lg font-semibold">
+              +
+            </button>
           </div>
           <p className="font-medium">₹{pricePerItem * quantity}</p>
         </div>
@@ -360,16 +485,16 @@ export default function CartPage() {
           </div>
         </div>
 
-        <button 
+        <button
           className={`w-full py-3 rounded-full font-semibold overflow-hidden ${
-            isLoading 
-              ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-              : 'bg-green-500 text-white hover:bg-green-700'
+            isLoading
+              ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+              : "bg-green-500 text-white hover:bg-green-700"
           }`}
           onClick={placeOrder}
           disabled={isLoading}
         >
-          {isLoading ? 'Processing...' : 'Place Order'}
+          {isLoading ? "Processing..." : "Place Order"}
         </button>
 
         {/* Available Offers */}
@@ -385,13 +510,15 @@ export default function CartPage() {
               onChange={(e) => setCouponCode(e.target.value)}
               className="border rounded p-2 w-full"
             />
-            <button 
+            <button
               className={`font-semibold px-6 py-2 rounded
-                  ${!couponCode.trim() 
-                    ? "bg-gray-100 text-gray-400"
-                    : "bg-green-500 text-white"
-                  }`} 
-              disabled={!couponCode.trim()}>
+                  ${
+                    !couponCode.trim()
+                      ? "bg-gray-100 text-gray-400"
+                      : "bg-green-500 text-white"
+                  }`}
+              disabled={!couponCode.trim()}
+            >
               Apply
             </button>
           </div>
@@ -399,10 +526,12 @@ export default function CartPage() {
 
         <div className="flex sm:flex-col md:flex-row gap-4 text-sm text-gray-600 justify-center">
           <div className="flex items-center gap-1">
-            <span className="material-icons text-gray-500">security</span> Secured Payment
+            <span className="material-icons text-gray-500">security</span>{" "}
+            Secured Payment
           </div>
           <div className="flex items-center gap-1">
-            <span className="material-icons text-gray-500">verified</span> Verified Merchant
+            <span className="material-icons text-gray-500">verified</span>{" "}
+            Verified Merchant
           </div>
         </div>
       </div>

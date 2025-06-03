@@ -25,11 +25,11 @@ const AdminLogin = () => {
       // Replace with your actual admin login API endpoint
       const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}api/auth/admin/login`, {
         method: 'POST',
+        // credentials: 'include', // Include cookies in the request
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
-        credentials: 'include', // Include cookies in the request
       });
 
       console.log("login response status:",response.status);

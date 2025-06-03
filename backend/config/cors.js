@@ -3,7 +3,11 @@
 const cors = require('cors');
 
 const corsOptions = {
-  origin: 'https://gimex-ortho-mongo-frontend.vercel.app',  // Replace with your frontend URL
+  origin: [
+    'https://gimexortho.com', 
+    'https://www.gimexortho.com',
+    
+  ],
   credentials: true,  // Allows cookies with cross-origin requests
 };
 

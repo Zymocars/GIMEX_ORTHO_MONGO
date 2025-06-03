@@ -1,6 +1,7 @@
 const functions = require("firebase-functions/v2");
 const express = require("express");
 const cors = require("cors");
+// const corsOptions  = require("./config/cors"); // Import CORS options
 const admin = require("firebase-admin");
 const connectDb = require("./config/db");
 const routes = require("./routes/route.js");
@@ -10,19 +11,13 @@ admin.initializeApp();
 
 const app = express();
 
-// Middleware
-app.use(cors({ origin: true }));
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-
-  next();
-});
+// Enable CORS for all origins
+// app.use(cors({origin: "*"}));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,17 +28,17 @@ app.use(async (req, res, next) => {
     await connectDb();
     next();
   } catch (error) {
-    console.error('Database connection error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Database connection error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
 // Routes
-app.use('/api', routes);
+app.use("/api", routes);
 
 // Default route
-app.get('/', (req, res) => {
-  res.json({ message: 'API is running...' });
+app.get("/", (req, res) => {
+  res.json({ message: "API is running..." });
 });
 
 // 404 handler
@@ -51,7 +46,7 @@ app.use((req, res) => {
   console.log(`404- Not Found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
     success: false,
-    message: 'Not Found'
+    message: "Not Found",
   });
 });
 
