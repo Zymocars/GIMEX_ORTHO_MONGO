@@ -27,7 +27,11 @@ import PersonalInfo from './Pages/PersonalInfo';
 // import AccountSettings from './Pages/AccountSettings';
 import UserOngoingOrders from './components/UserOngoinOrders';
 import UserOrders from './components/Orders';
-// import UserLogout from './components/LogOut';
+import UserLogout from './components/LogOut';
+import PrivacyPolicy from './components/Privacy_Policy';
+import TermsOfService from './components/TermsOfServices';
+import CancellationRefundPolicy from './components/Cancelation';
+import DebugProductsList from './components/DebugProductList';
 
 // Admin imports
 import Products from './Pages/Products';
@@ -50,6 +54,7 @@ const router = createBrowserRouter(
         <Route path='signupPage' element={<SignupPage />} />
         <Route path='LoginPage' element={<LoginPage />} />
         <Route path='Buy_Product' element={<ProductPage />} />
+        <Route path="/product/:productId" element={<ProductPage />} />
         <Route path='Cart_Page' element={<CartPage />} />
         <Route path='product_detail' element={<ProductDetails/>} />
         <Route path='contact' element={<Contact />} />
@@ -64,7 +69,11 @@ const router = createBrowserRouter(
         {/* <Route path='account_settings' element={<AccountSettings />} /> */}
         <Route path='user-orders' element={<UserOrders />} />
         <Route path='user-ongoing-orders' element={<UserOngoingOrders />} />
-        {/* <Route path='user-logout' element={<UserLogout />} /> */}
+        <Route path='user-logout' element={<UserLogout />} />
+        <Route path='privacy-policy' element={<PrivacyPolicy />} />
+        <Route path='terms-of-service' element={<TermsOfService />} />
+        <Route path='cancellation-refund-policy' element={<CancellationRefundPolicy />} />
+        <Route path="/debug-products" element={<DebugProductsList />} />
       </Route>
 
       {/* Admin Login Route - Not protected by AdminRoute */}

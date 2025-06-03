@@ -1,32 +1,30 @@
-const mongoose=require('mongoose');
-const bcrypt=require('bcryptjs');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-//Mongoose schema for user
-const UserSchema =mongoose.Schema(
+// Mongoose schema for user
+const UserSchema = mongoose.Schema(
     {
-        name:{
-            type:String,
-            required:true
+        name: {
+            type: String,
+            required: true
         },
-        email:{
-            type:String,
-            required:true,
-            unique:true,
-            match:/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ //regix for email pattern verification
-
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ // regex for email pattern verification
         },
-
         role: { type: String, enum: ['Admin', 'User'], default: 'User' },
         status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },
         joined: { type: Date, default: Date.now },
         
-        password:{    //stored in hashed form
-            type:String,
-            required:true,
-            minlength:6,
-            select:false,
+        password: {    // stored in hashed form
+            type: String,
+            required: true,
+            minlength: 6,
+            select: false,
         },
-        isAdmin: {    // set roles ,is an admin or non-admin , can use enums if more than one role
+        isAdmin: {    // set roles, is an admin or non-admin, can use enums if more than one role
             type: Boolean,
             required: true,
             default: false,
@@ -42,12 +40,12 @@ const UserSchema =mongoose.Schema(
         },
         resetPasswordToken: String,
         resetPasswordExpires: Date,
-
     },
-    
     {
-        timestamps:true
+        timestamps: true
     }
 );
-const User = mongoose.model('User', UserSchema);
+
+// Check if model exists before creating to prevent overwrite error
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
 module.exports = User;
