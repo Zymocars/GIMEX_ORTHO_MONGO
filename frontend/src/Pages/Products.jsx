@@ -14,6 +14,7 @@ const Products = () => {
     stock: "",
     description: "",
     image: "",
+    brand: "", // Add brand field
   });
   const [editMode, setEditMode] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
@@ -61,7 +62,17 @@ const Products = () => {
 
     setFormData({
       ...formData,
-      [name]: value, // Keep original value without modification
+      [name]: value,
+    });
+  };
+
+  // Handle file input changes (for image)
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    // For now, store the file name or handle file upload separately
+    setFormData({
+      ...formData,
+      image: file ? file.name : "", // Store file name or URL after upload
     });
   };
 
@@ -228,6 +239,7 @@ const Products = () => {
       stock: product.stock.toString(),
       description: product.description || "",
       image: product.image || "",
+      brand: product.brand || "", // Add brand field
     });
     setCurrentProductId(product._id);
     setEditMode(true);
@@ -243,6 +255,7 @@ const Products = () => {
       stock: "",
       description: "",
       image: "",
+      brand: "", // Add brand field
     });
     setEditMode(false);
     setCurrentProductId(null);
@@ -339,6 +352,17 @@ const Products = () => {
                   required
                 />
               </div>
+              <div>
+                <label className="block text-gray-300 mb-2">Brand</label>
+                <input
+                  type="text"
+                  name="brand"
+                  value={formData.brand}
+                  onChange={handleChange}
+                  className="w-full bg-gray-700 text-white border border-gray-600 rounded py-2 px-3 focus:outline-none focus:border-green-500"
+                  required
+                />
+              </div>
               <div className="md:col-span-2">
                 <label className="block text-gray-300 mb-2">Description</label>
                 <textarea
@@ -350,12 +374,11 @@ const Products = () => {
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-gray-300 mb-2">Image URL</label>
+                <label className="block text-gray-300 mb-2">Image</label>
                 <input
                   type="file"
                   accept="image/*"
-                  value={formData.image}
-                  onChange={handleChange}
+                  onChange={handleFileChange} // Use separate handler for file input
                   className="w-full bg-gray-700 text-white border border-gray-600 rounded py-2 px-3 focus:outline-none focus:border-green-500"
                 />
               </div>
