@@ -1,14 +1,5 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
-import {
-  FaTachometerAlt,
-  FaBoxOpen,
-  FaShoppingCart,
-  FaUsers,
-  FaPlus,
-  FaClock,
-  FaSignInAlt,
-} from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const footerLinks = [
@@ -54,32 +45,47 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-black text-white py-8 w-full overflow-hidden">
-      <div className="md:max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 custom-grid lg-custom:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-6 sm:bg-red-500 md:bg-blue-500 lg-custom:bg-yellow-500 lg:bg-green-500 xl:bg-purple-500">
+    <footer className="footer-wrapper bg-black text-white py-8 w-full">
+      <style>
+        {`
+          .custom-footer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          @media (min-width: 1024px) {
+            .custom-footer-grid {
+              grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+          }
+        `}
+      </style>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="custom-footer-grid grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 sm:bg-red-500 md:bg-blue-500 lg:bg-green-500 xl:bg-purple-500">
           {footerLinks.map((section, index) => (
             <div key={index}>
-              <h2 className="text-lg font-semibold mb-4">{section.title}</h2>
+              <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">{section.title}</h2>
               {section.links && (
-                <ul className="space-y-2">
+                <ul className="space-y-1 sm:space-y-2">
                   {section.links.map((link, i) => (
                     <li key={i}>
-                      <Link to={link.href} className="text-gray-400 hover:text-white">{link.name}</Link>
+                      <Link to={link.href} className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base">
+                        {link.name}
+                      </Link>
                     </li>
                   ))}
                 </ul>
               )}
-              {section.text && <p className="text-gray-300">{section.text}</p>}
+              {section.text && <p className="text-gray-300 text-xs sm:text-sm">{section.text}</p>}
               {section.action && (
-                <a
-                  href={section.action.href}
-                  className="inline-block mt-2 text-gray-400 hover:text-white"
+                <Link
+                  to={section.action.href}
+                  className="inline-block mt-1 sm:mt-2 text-gray-400 hover:text-white transition-colors text-sm sm:text-base"
                 >
                   {section.action.text}
-                </a>
+                </Link>
               )}
               {section.email && (
-                <a href={`mailto:${section.email}`} className="text-gray-400">
+                <a href={`mailto:${section.email}`} className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base">
                   {section.email}
                 </a>
               )}
