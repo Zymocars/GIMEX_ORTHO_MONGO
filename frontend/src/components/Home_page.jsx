@@ -14,7 +14,7 @@ export default function Home_page() {
 
   const handleBuyNow = () => {
     console.log('Navigating to product:', productId); // Debug log
-    navigate(`/product/${productId}`);
+    navigate(`/Buy_Product/${productId}`);
   };
 
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
