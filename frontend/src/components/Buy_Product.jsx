@@ -12,7 +12,7 @@ export default function ProductPage() {
   const { productId } = useParams();
   
   // API URL - same as your admin component
-  const API_URL = `${import.meta.env.VITE_REACT_APP_API_URL}api`;
+  const API_URL = import.meta.env.VITE_REACT_APP_API_URL?.replace(/\/$/, '');
 
   // Default fallback product data (your current hardcoded data)
   const defaultProduct = {
@@ -33,15 +33,19 @@ export default function ProductPage() {
     try {
       setLoading(true);
       
-      // If no productId, use default product
       if (!productId) {
-        // setProduct(defaultProduct);
-        // setLoading(false);
-        setError("No product ID provided")
+        setError("No product ID provided");
         return;
       }
 
-      const response = await fetch(`${API_URL}/products/${productId}`, {
+      // Log the request details
+      console.log('Fetching product:', productId);
+      
+      // Construct the URL properly
+      const url = `${API_URL}/api/products/${productId}`;
+      console.log('Full API URL:', url);
+
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -49,22 +53,27 @@ export default function ProductPage() {
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error('API Error:', response.status);
+        // Try to get error details from response
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Product not found (${response.status})`);
       }
       
       const data = await response.json();
+      console.log('API Response:', data);
       
       if (data.success && data.data) {
         setProduct(data.data);
       } else {
-        // Fallback to default product if API fails
-        console.warn("API failed, using default product");
-        // setProduct(defaultProduct);
+        // If no product found, use default product
+        setProduct(defaultProduct);
+        console.log('Using default product data');
       }
     } catch (err) {
-      // Fallback to default product on any error
-      console.warn("Error fetching product, using default:", err);
-      // setProduct(defaultProduct);
+      console.error('Error:', err);
+      // Use default product as fallback
+      setProduct(defaultProduct);
+      setError(`${err.message} - Using default product data`);
     } finally {
       setLoading(false);
     }
@@ -73,7 +82,7 @@ export default function ProductPage() {
   // Fetch product on component mount
   useEffect(() => {
     fetchProduct();
-  }, [productId]);
+  }, [productId, API_URL]); // Add API_URL as dependency
 
   const handleCart = () => {
     navigate("/Cart_Page");
@@ -104,23 +113,36 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+      <div className="w-full min-h-screen flex items-center justify-center bg-white p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm md:text-base">Loading product...</p>
+        </div>
       </div>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error || "Product not found"}</p>
-          <button 
-            onClick={() => navigate('/')}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          >
-            Go Back to Home
-          </button>
+      <div className="w-full min-h-screen flex items-center justify-center bg-white p-4">
+        <div className="text-center w-full">
+          <p className="text-red-600 mb-4 text-sm md:text-base">
+            {error || "Product not found"}
+          </p>
+          <div className="flex flex-col gap-2">
+            <button 
+              onClick={() => window.location.reload()}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm md:text-base"
+            >
+              Try Again
+            </button>
+            <button 
+              onClick={() => navigate('/')}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm md:text-base"
+            >
+              Go Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );
