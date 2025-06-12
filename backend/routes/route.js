@@ -71,7 +71,6 @@ router.get("/products/:id", async (req, res) => {
 router.get("/products", async (req, res) => {
   try {
     const products = await getAllProducts();
-
     res.json({
       success: true,
       data: products,
