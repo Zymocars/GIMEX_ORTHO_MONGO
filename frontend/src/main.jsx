@@ -26,7 +26,7 @@ import UserDashboard from './Pages/UserDashboard';
 import PersonalInfo from './Pages/PersonalInfo';
 // import AccountSettings from './Pages/AccountSettings';
 import UserOngoingOrders from './components/UserOngoinOrders';
-import UserOrders from './components/Orders';
+import UserOrders from './components/UserOrders';
 import UserLogout from './components/LogOut';
 import PrivacyPolicy from './components/Privacy_Policy';
 import TermsOfService from './components/TermsOfServices';

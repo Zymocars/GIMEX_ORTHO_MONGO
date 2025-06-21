@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const Orders = () => {
+const UserOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,7 +17,7 @@ const Orders = () => {
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}api/admin/getallorders` , {
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}api/user/getorders` , {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -128,4 +128,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default UserOrders;
