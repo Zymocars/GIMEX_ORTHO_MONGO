@@ -32,7 +32,7 @@ const Dashboard = () => {
     isRefreshing.current = true;
     refreshAttempts.current += 1;
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5001/zymo-prod/us-central1/orthoAPI';
+      const apiUrl =  import.meta.env.VITE_REACT_APP_API_URL || 'http://127.0.0.1:5001/zymo-prod/us-central1/orthoAPI';
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
         throw new Error('No refresh token found');
@@ -73,7 +73,7 @@ const Dashboard = () => {
         navigate('/login');
         return;
       }
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5001/zymo-prod/us-central1/orthoAPI';
+      const apiUrl = import.meta.env.VITE_REACT_APP_API_URL || 'http://127.0.0.1:5001/zymo-prod/us-central1/orthoAPI';
       const endpoint = `${apiUrl}/api/dashboard/stats`;
       console.log('Fetching from:', endpoint);
       let response = await fetch(endpoint, {
