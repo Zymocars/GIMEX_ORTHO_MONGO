@@ -3,8 +3,26 @@ import { TruckIcon, TagIcon } from "@heroicons/react/24/outline";
 import { createRazorpayOrder, loadScript } from "../utils/razorpayUtils";
 
 export default function CartPage() {
+  // Get saved product data
+  const [cartProduct, setCartProduct] = useState(() => {
+    const saved = localStorage.getItem("cartProduct");
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return {
+      _id: "default",
+      name: "GIMEX Ortho",
+      price: 44,
+      originalPrice: 49,
+      discount: 10,
+      quantity: 1,
+      image: "/images/Gimex_1.png",
+      stock: 100,
+    };
+  });
+
+  const [quantity, setQuantity] = useState(cartProduct.quantity || 1);
   const [deliveryOption, setDeliveryOption] = useState("address");
-  const [quantity, setQuantity] = useState(1);
   const [couponCode, setCouponCode] = useState("");
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [addressInfo, setAddressInfo] = useState({
@@ -22,23 +40,25 @@ export default function CartPage() {
     success: false,
     message: "",
   });
-  const pricePerItem = 44;
-  const deliveryFee = 50;
-  const originalPrice = 49; // Original price before discount
-  const [cartItems, setCartItems] = useState([
-    {
-      _id: "645a567890abcdef12345678", // Example ObjectId
-      name: "GIMEX Ortho",
-      originalPrice: 49,
-      discountedPrice: 49 * 0.9,
-      quantity: 1,
-      image: "/images/Gimex_1.png",
-    },
-  ]);
 
-  const handleIncrease = () => setQuantity(quantity + 1);
+  const handleIncrease = () => {
+    if (quantity < cartProduct.stock) {
+      setQuantity(quantity + 1);
+      updateLocalStorage(quantity + 1);
+    }
+  };
+
   const handleDecrease = () => {
-    if (quantity > 1) setQuantity(quantity - 1);
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+      updateLocalStorage(quantity - 1);
+    }
+  };
+
+  const updateLocalStorage = (newQuantity) => {
+    const updatedProduct = { ...cartProduct, quantity: newQuantity };
+    setCartProduct(updatedProduct);
+    localStorage.setItem("cartProduct", JSON.stringify(updatedProduct));
   };
 
   const handleAddressChange = (e) => {
@@ -119,7 +139,7 @@ export default function CartPage() {
     }
 
     try {
-      const amount = parseInt(pricePerItem * quantity + deliveryFee);
+      const amount = parseInt(cartProduct.price * quantity + deliveryFee);
       const orderData = await createRazorpayOrder(amount, "INR", token);
       if (!orderData || !orderData.data) {
         setOrderStatus({
@@ -163,14 +183,16 @@ export default function CartPage() {
     try {
       // Format the order data to match the expected structure in the admin dashboard
       const orderData = {
-        products: cartItems.map((item) => ({
-          productId: item._id, // Use the actual ObjectId from the product data
-          name: item.name,
-          originalPrice: item.originalPrice,
-          discountedPrice: item.discountedPrice,
-          quantity: item.quantity,
-          image: item.image,
-        })),
+        products: [
+          {
+            productId: cartProduct._id,
+            name: cartProduct.name,
+            originalPrice: cartProduct.originalPrice,
+            price: cartProduct.price,
+            quantity: quantity,
+            image: cartProduct.image,
+          },
+        ],
         deliveryAddress: {
           name: addressInfo.name,
           mobile: addressInfo.mobile,
@@ -181,7 +203,7 @@ export default function CartPage() {
           pincode: addressInfo.pincode,
         },
         deliveryFee: deliveryFee,
-        totalAmount: itemTotal + deliveryFee,
+        totalAmount: grandTotal,
         couponCode: couponCode.trim() || null,
         orderDate: new Date().toISOString(),
       };
@@ -202,19 +224,16 @@ export default function CartPage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // Clear cart data
+        localStorage.removeItem("cartProduct");
         setOrderStatus({
           success: true,
-          message:
-            "Order placed successfully! Your order ID is " + data.data._id,
+          message: "Order placed successfully! Your order ID is " + data.data._id,
         });
 
-        // Clear cart or reset order form after successful order
+        // Reset form
         setQuantity(1);
         setCouponCode("");
-        // Don't reset address as user might place another order with same address
-
-        // You could redirect to order confirmation page here
-        // window.location.href = `/order-confirmation/${data.data._id}`;
       } else {
         setOrderStatus({
           success: false,
@@ -234,7 +253,8 @@ export default function CartPage() {
     }
   };
 
-  const itemTotal = pricePerItem * quantity;
+  const itemTotal = cartProduct.price * quantity;
+  const deliveryFee = 50;
   const grandTotal = itemTotal + deliveryFee;
 
   return (
@@ -443,16 +463,18 @@ export default function CartPage() {
       <div className="w-full md:w-1/3 border-t md:border-t-0 md:border-l p-4 space-y-4 bg-rose-200">
         <div className="flex flex-row sm:flex-row gap-6 items-start">
           <img
-            src="/images/Gimex_1.png"
-            alt="Success ortho powder"
+            src={cartProduct.image}
+            alt={cartProduct.name}
             className="w-[30px] h-[30px] mt-2"
           />
           <div className="flex-1">
-            <p className="font-medium">GIMEX Ortho</p>
+            <p className="font-medium">{cartProduct.name}</p>
             <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-              <span className="line-through">₹{originalPrice}</span>
-              <span className="text-black">₹{pricePerItem}</span>
-              <span className="text-green-600 font-semibold">10% OFF</span>
+              <span className="line-through">₹{cartProduct.originalPrice}</span>
+              <span className="text-black">₹{cartProduct.price}</span>
+              <span className="text-green-600 font-semibold">
+                {cartProduct.discount}% OFF
+              </span>
             </div>
           </div>
           <div className="flex items-center gap-2 border px-2 py-1 rounded-full">
@@ -464,7 +486,7 @@ export default function CartPage() {
               +
             </button>
           </div>
-          <p className="font-medium">₹{pricePerItem * quantity}</p>
+          <p className="font-medium">₹{cartProduct.price * quantity}</p>
         </div>
 
         <div className="border-t pt-4">

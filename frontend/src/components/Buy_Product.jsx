@@ -85,6 +85,19 @@ export default function ProductPage() {
   }, [productId, API_URL]); // Add API_URL as dependency
 
   const handleCart = () => {
+    // Save product details to localStorage before navigation
+    const cartProduct = {
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      originalPrice: originalPrice,
+      discount: discount,
+      quantity: quantity,
+      image: product.image || "/images/Gimex_1.png",
+      stock: product.stock
+    };
+    
+    localStorage.setItem('cartProduct', JSON.stringify(cartProduct));
     navigate("/Cart_Page");
   };
 
@@ -130,12 +143,12 @@ export default function ProductPage() {
             {error || "Product not found"}
           </p>
           <div className="flex flex-col gap-2">
-            <button 
+            {/* <button 
               onClick={() => window.location.reload()}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm md:text-base"
             >
               Try Again
-            </button>
+            </button> */}
             <button 
               onClick={() => navigate('/')}
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm md:text-base"
