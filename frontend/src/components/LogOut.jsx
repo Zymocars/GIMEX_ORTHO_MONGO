@@ -11,7 +11,7 @@ function UserLogout() {
     
     try {
       // Log the API URL and token for debugging
-      console.log('API URL:', import.meta.env.VITE_API_URL);
+      console.log('API URL:', import.meta.env.VITE_REACT_APP_API_URL);
       console.log('Token exists:', !!token);
       
       // Only call API if we have a token
@@ -37,7 +37,7 @@ function UserLogout() {
       navigate('/'); // Redirect to home page
       
     } catch (error) {
-      console.error('API URL:', import.meta.env.VITE_API_URL);
+      console.error('API URL:', import.meta.env.VITE_REACT_APP_API_URL);
       console.error('Logout error:', error);
       console.error('Error details:', {
         status: error.response?.status,
